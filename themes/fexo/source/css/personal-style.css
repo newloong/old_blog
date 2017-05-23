@@ -1,0 +1,200 @@
+.content-home .name {    
+    font-weight: normal;
+    margin: 10px auto 0;
+    font-size: 22px;
+}
+
+.page-header .box-blog-info .info .name {
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1;
+    margin: 0;
+    padding-top: 8px;
+    color: #000;
+    border: 0;
+}
+
+body {
+    background-color: #f5f5d5;
+}
+
+.content {    
+    border-left: 4px solid #DEEBF7;
+}
+
+.page-header {    
+    background: #f5f5d5;
+}
+
+.content.content-search .list-search .item .post-content {
+    line-height: 1.4;
+    font-size: 14px;
+}
+
+@media screen and (min-width: 768px) {
+    .page-header .box-blog-info {
+        margin-top: 20px;
+    }
+}
+
+.content.content-search .list-search .tip {
+    font-size: 14px;
+}
+
+.content.content-link .tip i, .content.content-link .tip span {
+    color: #666;
+    font-size: 14px;
+}
+.content.content-link .tip .icon-mail {
+    background: #dfdfdf;
+}
+
+.article-content h1, h2, h3 {
+    margin: 0.4em 0 0.2em 0;
+    padding: 0 0 0.2em 0;
+    color: #000000;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.article-content h2 {
+    margin-top: 50px;
+    font-size: 26px;
+}
+
+.article-content h3 {
+    margin-top: 40px;
+    color: #333;
+    font-size: 20px;
+}
+
+.article-content p {
+    font-size: 16px;
+    line-height: 1.6em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.article-content a {
+    color: #223472;
+    text-decoration: underline;
+}
+
+figure.highlight {
+    display: block;
+    overflow-x: auto;
+    margin: 0 0 20px;
+    padding: 20px;
+    color: #000;
+    font-size: 15px;
+    border-radius: 1em;
+    background-color: #f5f2f0;
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    overflow-y: hidden;
+    border-width: 0.3em;
+    border-color: #e0dfcc;
+    border-style: solid;
+    text-shadow: 0 1px white;
+}
+
+.highlight pre {
+    line-height: 1.6em;
+    font-size: 15px;
+    color: #000;
+    overflow-y: hidden;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+}
+
+.post-header .toolbox {
+    background: #f5f5d5; 
+}
+
+.toolbox .toolbox-entry {
+    color: #fff;    
+    background: orange;
+}
+
+code {
+    padding: 1px 6px;
+    vertical-align: middle;
+    border-radius: 4px;
+    background-color: #f7f7f7;
+    color: #e96900;
+    font-size: 15px;
+}
+
+.article-content ol, .article-content ul {
+    font-size: 15px;
+    color: #333;
+    margin-left: 20px;
+    line-height: 1.8
+}
+.menubox {
+    width: 760px;
+    margin: 30px auto;
+}
+
+.menubox .list-toolbox .item-toolbox {
+    display: inline-block;
+}
+
+.menubox .list-toolbox .item-toolbox a.ROUND_RECT {
+    padding: 0 20px;
+}
+
+.menubox .list-toolbox .item-toolbox a {
+    font-size: 14px;
+    line-height: 40px;
+    display: inline-block;
+    height: 40px;
+    text-align: center;
+    color: #333;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-right: 5px;
+    background: #f0f0f0;
+    color: #333;
+    border: 1px solid #d3d3d3;
+}
+
+.menubox .list-toolbox .item-toolbox a:hover {
+    background: orange;
+    color: #fff;
+}
+
+
+@media screen and (min-width: 768px) {
+    .content.content-post {
+        margin-top: 0px;
+    }
+}
+
+.content.content-post .article-header {
+    margin-bottom: 40px;
+    border-radius: 5px;
+    border: 1px solid #d3d3d3;
+    padding: 20px 20px 0 20px;}
+
+.content.content-post .article-header .article-meta {
+    font-size: 14px;
+    margin-top: 8px;
+    margin-bottom: 30px;
+    color: #666;
+}
+
+.content.content-post .article-header .article-meta a {
+    color: orange;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.content.content-post .article-header .post-title {
+    font-size: 24px;
+    font-weight: normal;
+    margin: 0 0 12px;
+    color: #666;
+}

@@ -18,6 +18,8 @@ menu:
   sitemap: 站点地图
   commonweal: 公益404
   laravel-tutorial: Laravel教程
+  php: PHP 相关知识技能整理
+  php-step-1: 第1章：PHP框架是如何诞生的？
 
 sidebar:
   overview: 站点概览

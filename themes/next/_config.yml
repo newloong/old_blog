@@ -45,6 +45,8 @@ index_with_subtitle: false
 # When running the site in a subdirectory (e.g. domain.tld/blog), remove the leading slash (/archives -> archives)
 menu:
   new: /
+  php: /categories/与-PHP-相关的知识和技能整理/
+  php-step-1: /与-PHP-相关的知识和技能整理/PHP框架是如何诞生的/
   # about: /about
   # laravel-tutorial: http://blog.zhoujiping.com/laravel-tutorial.html
   #sitemap: /sitemap.xml
@@ -71,6 +73,11 @@ menu_icons:
   commonweal: heartbeat
   laravel-tutorial: book
   new: refresh
+  php: book
+  php-step-1: angle-right
+  php-step-2: angle-right
+  php-step-3: angle-right
+
 
 
 

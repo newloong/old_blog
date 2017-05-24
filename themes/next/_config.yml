@@ -122,7 +122,7 @@ font:
   # Fallback to `global` font settings.
   posts:
     external: true
-    family:
+    family: PingFang SC
 
   # Font settings for Logo
   # Fallback to `global` font settings.

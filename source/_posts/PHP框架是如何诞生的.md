@@ -1,7 +1,7 @@
 ---
 title: 论PHP框架是如何诞生的?
-date: 2017-05-23 16:05:28
-updated: 2017-05-23 16:05:28
+date: 2017-05-23
+updated: 2017-05-25
 categories:
  - php
 ---
@@ -288,7 +288,243 @@ http://localhost:8888/?name=<a%20href="http://blog.zhoujiping.com">周继平的�
 
 ## PHP 显示和逻辑相分离
 
-未完。。。
+将 php 代码嵌入到 html 中， 我们就可以在页面中编写任何逻辑代码，比如整个变量，连接数据库，查询数据，验证数据，输出数据等等，如果把所有的东西都放在这个页面中，那在开发和维护上都会非常的痛苦，所以我们需要将它们拆分开来。让每个文件内做最小的事，很多的 php 框架就是这么干的。
+
+比如我们之前写的 `index.php`, 我们就可以将它拆分，我们新建一个 `index.view.php` 的文件，将 html 的代码都放在这里
+
+```php
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>index.view.php</title>
+    <style>
+        header {
+            background-color: #f5f8fc;
+            padding: 2em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    
+    <header>
+        <h1>
+            <!-- 这里只输出变量 -->
+            Hello, <?=$name; ?>  
+        </h1>
+    </header>
+
+</body>
+</html>
+```
+
+将 `index.php` 改写为
+
+```php
+<?php 
+
+    $name = '周继平';
+
+    require 'index.view.php';
+```
+
+当 `index.php` 被运行时，会通过 `require` 将 `index.view.php` 包含进来， 所以当我们访问： http://localhost:8888/index.php  会得到相同的结果。 这就是最简陋的视图和逻辑分离。
+
+## 索引数组
+
+如果出现这样一个情况，我们需要输出几个人的名字，如果按照之前的做法我们会这么写：
+
+```php
+    // 在 index.php 中定义变量
+    $nameOne = '周继平'; 
+    $nameTwo = 'Zhou Jiping';
+    $nameThree = 'Kuker Chou';
+
+    // 在 index.view.php 中输出
+    <header>
+        <ul>
+            <li>Hello, <?=$nameOne; ?></li>
+            <li>Hello, <?=$nameTwo; ?></li>
+            <li>Hello, <?=$nameThree; ?></li>
+        </ul>
+    </header>
+```
+
+这么写没有问题，程序可以跑通，但是不方便管理，检索和数据处理了，所以这时候我们需要数组来帮助我们，在现代 php 中，数组使用一对中括号 `[]` 来定义, 如：
+```php
+    $names = []; // 定义一个变量名为 $names 的空数组
+```
+如此，`index.php` 中的用三个变量来存储名字的代码就可以使用数组来做：
+
+```php
+    $names = [
+        '周继平', 
+        'Zhou Jiping',
+        'Kuker Chou'
+    ];
+```
+
+`$names` 就是一个索引数组，索引数组的每个元素都有个下标，从`0`开始，如通过 `$names[0]` 即可获得第一个元素的值，如果要遍历数组的值， 可以使用 `foreach` 语句， `foreach` 会从数组的第一个元素开始遍历至最后一个元素。`index.view.php` 中改写如下：
+
+```php
+    <header>
+        <ul>
+            <?php
+                foreach ($names as $name) {
+                    echo "<li>Hello, {$name}</li>";
+                }
+            ?>
+        </ul>
+    </header>
+```
+
+这样改写程序还是能够跑通， 不过像 `index.view.php` 中我们使用 `{ }` 会让代码看起来比较的凌乱，尤其是当双引号中的 html 标签变多的时候，这时候对于 `echo` 和控制结构（类式 `foreach`, `if`, `while`）的语句我们可以使用替代语法，`echo` 的替代语法我们已经用过了，如下：
+
+```php
+<?php echo $variable; ?>
+// 可替代为
+<?= $variable; ?>
+```
+而像上面的 `foreach` 语句可以这样替代
+
+```php
+    <header>
+        <ul>
+            <!-- 开始的 { 用 : 替代 -->
+            <?php foreach ($names as $name) : ?> 
+                 <li>Hello, <?= $name ?></li>
+            <?php endforeach; ?>
+            <!-- 结束的 } 用 endforeach 替代; -->
+        </ul>
+    </header>
+```
+
+如果你曾经用过一些模版引擎，是不是发现这样的书写已经有点它们的影子存在了。
+
+> 关于更多的替代语法，请查阅这里 http://codeigniter.org.cn/user_guide/general/alternative_php.html
+
+## 关联数组
+
+上面我们说到索引数组，它可以包含一系列的元素，如果出现这样一个情况，我们将一个人的名字，年龄，肤色保存在一个数组中，如果使用索引数组，那么是这样的：
+
+```php
+$person = [
+    '周继平',
+    3,
+    '狗屎色'
+];
+```
+虽然用数组保存了这些元素，但是我们不知道这些元素究竟代表什么，如果我们可以将每个元素都设置一个 `key` , 那就会清楚很多，如下：
+
+```php
+$person = [
+    'name' => '周继平',
+    'age'  => 3,
+    'skin_color' => '狗屎色'
+];
+```
+
+想上面这样的数组就是关联数组，通过 `key => value` 的形式来定义一个元素, 如果想获取具体的元素的值，可以像 `$person['name']` 这样来获得，也可以通过 `foreach($array as $value)` 或是 `foreach($array as $key => $value)` 语句循环的操作它们, 请将 `index.php` 中的数组改成上面的关联数组，然后在 `index.view.php` 中我们这样输出：
+
+```php
+    <header>
+        <ul>
+            <?php foreach ($person as $key => $value) : ?>
+                 <li><strong><?= $key; ?></strong>: <?= $value ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </header>
+```
+
+## 简单的调试
+
+我们可以用 `echo` 输出字符串，但是不能输出一个数组的所有值，可以使用 `print`, 或者使用 `var_dump()` 函数，
+我们经常会使用 `var_dump()` 来查看一个变量中具体有哪些值及其类型，如我们可以在 `index.php` 中 `$person` 数组下加上 `var_dump($person)` 这句代码来查看 `$person` 的值, 但是会发现`index.view.php`中的内容也输出了，这时候我们可以在其下在加上一句 `die()` 函数，让程序执行到这里结束，通过这两个函数就可以进行断点调试了
+，如下：
+```php
+var_dump($person);
+die();
+
+// 或者这么写
+die(var_dump($person));
+```
+
+## 布尔值和条件判断语句
+
+在任何时候，人类都需要做出选择，写程序也一样，在 PHP 中有一种值的类型叫做布尔型`（Bollean）`, 它只有两个值 `true` 和 `false`, 它通常和判断语句 `if--else`一起使用。自己体会下就会明白，判断语句的语法结构如下:
+
+```php
+if (true) {
+    // 
+} elseif () {
+    //
+} else {
+   //
+}
+```
+
+## 函数
+
+我们之前接触的`var_dump()` 这种就是函数，函数的定义如下：
+
+```php
+    function name($argment1, $argment2, ...) 
+    {
+        // code
+    }
+```
+`function` 是 php 的一个关键字，代表你想定义一个函数， `name` 是你自己定义的一个名字，命名规则也是用小驼峰法，`$argment1, $argment2` 这些是函数的参数，其实就是变量，当你调用函数的时候，写上对应的值即可。
+
+我们将刚才用语断点测试的代码写成一个函数，然后调用它，你就会明白怎么定义和调用函数了，首先要在与 `index.php` 同级目录下建立一个 `functions.php` 的文件，专门用来存放我们写的函数, 然后写上我们的断点调试函数，我们取名为 `dd`,
+`dumper and die` 的意思。
+
+```php
+// functions.php
+<?php
+
+    function dd($data)
+    {
+        echo '<pre>';
+        die(var_dump($data));
+        echo '</pre>';
+    }
+
+```
+我们在 `index.php` 中引入 `functions.php`, 并调用 `dd()` 函数
+
+```php
+<?php 
+
+require 'functions.php';
+
+$person = [
+    'name' => '周继平',
+    'age'  => 3,
+    'skin_color' => '狗屎色'
+];
+
+dd($person);
+
+require 'index.view.php';
+```
+
+上面是 PHP 最基础的部分，每一部分都是点到而已，但是这已经够了，你在学习的是一门计算机的语言，和学英语是一样的道理，重要的在于实践，往往很多时候我们无法动手做的原因在于对整个流程不清楚，你知道了一些基础和流程，就可以通过 google, github, stackoverflow, 还有 php 的官方文档来开启和深入你的 php 生涯了，实践很重要，尤其是语言，像我读大学的时候英语一直很差，后来自己开办了个老外学普通话的机构，说的多了，写的多了，自然而然的英文水平就提高了些。
+
+当然，当你已经开发了几个项目后，你就得回头来系统的补下基础了，这个基础包括计算机系统原理，算法和数据结构，C语言等。
+
+有了上面的基础了，下面我们开始接触下mysql, php 的面向对象，然后开始谈下框架的演变过程。
+
+## 接触 Mysql
+
+未完 。。。
+
+
+
+
+
+
+
 
 
 

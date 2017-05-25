@@ -317,15 +317,15 @@ baidu_analytics: e7243fd57a656c8d3bc71a28928e2416
 
 # Disqus
 disqus:
-  enable: false
+  enable: true
   shortname: zhoujiping
-  count: true
+  count: false
 
 # Hypercomments
 #hypercomments_id:
 
 # Gentie productKey
-gentie_productKey: 1e5d33126cb04fa89ffe3aa3e105bb55
+# gentie_productKey: 1e5d33126cb04fa89ffe3aa3e105bb55
 
 # changyan
 changyan:

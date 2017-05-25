@@ -1,5 +1,6 @@
 {% if page.comments %}
   <div class="comments" id="comments">
+    <h3>评论区 - 采用 Disqus 插件，想查看或发表评论需翻墙！</h3>
     {% if (theme.duoshuo and theme.duoshuo.shortname) or theme.duoshuo_shortname %}
       <div class="ds-thread" data-thread-key="{{ page.path }}"
            data-title="{{ page.title }}" data-url="{{ page.permalink }}">

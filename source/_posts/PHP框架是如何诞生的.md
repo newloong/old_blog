@@ -12,8 +12,6 @@ categories:
 
 ## 安装PHP运行环境
 
-再这之前还有一个非常重要的问题要想清楚，你真的决定要做程序员了？还没有想好是吧，赶紧关了页面吧！如果你还有其它的路可走，那就不要进入这行了，俗话说"好男不当兵，有出路就不做程序员！"，嗨，老铁！ 如果还有出路，就别做程序员了。
-
 `PHP`是一个脚本语言，要运行一段`PHP`的脚本，需要安装PHP解析器，如果你使用的是`Windows`操作系统， 那么自己搜索下安装方法，如果你使用的是`Mac`系统，我们可以通过`Homebrew`来安装。
 
 `Mac`系统自带了版本为 5.6 的`PHP`，可以打开`终端(Terminal)` 输入命令 `php -v` 查看
@@ -452,12 +450,12 @@ die(var_dump($person));
 
 ## 布尔值和条件判断语句
 
-在任何时候，人类都需要做出选择，写程序也一样，在 PHP 中有一种值的类型叫做布尔型`（Bollean）`, 它只有两个值 `true` 和 `false`, 它通常和判断语句 `if--else`一起使用。自己体会下就会明白，判断语句的语法结构如下:
+在任何时候，人类都需要做出选择，写程序也一样，在 PHP 中有一种值的类型叫做布尔型`（Bollean）`, 它只有两个值 `true` 和 `false`, 它通常和判断语句 `if--else`一起使用。翻译成中文就是，如果为 true或false 我做什么事，否则我做别的事，自己体会下就会明白，判断语句的语法结构如下:
 
 ```php
-if (true) {
+if (true or false) {
     // 
-} elseif () {
+} elseif ( true or false) {
     //
 } else {
    //
@@ -476,11 +474,9 @@ if (true) {
 ```
 `function` 是 php 的一个关键字，代表你想定义一个函数， `name` 是你自己定义的一个名字，命名规则也是用小驼峰法，`$argment1, $argment2` 这些是函数的参数，其实就是变量，当你调用函数的时候，写上对应的值即可。
 
-我们将刚才用语断点测试的代码写成一个函数，然后调用它，你就会明白怎么定义和调用函数了，首先要在与 `index.php` 同级目录下建立一个 `functions.php` 的文件，专门用来存放我们写的函数, 然后写上我们的断点调试函数，我们取名为 `dd`,
-`dumper and die` 的意思。
+我们将刚才用于断点测试的代码写成一个函数，然后调用它，你就会明白怎么定义和调用函数了，首先要在与 `index.php` 同级目录下建立一个 `functions.php` 的文件，专门用来存放我们写的函数, 然后写上我们的断点调试函数，我们取名为 `dd`, `dumper and die` 的意思。
 
 ```php
-// functions.php
 <?php
 
     function dd($data)
@@ -509,7 +505,7 @@ dd($person);
 require 'index.view.php';
 ```
 
-上面是 PHP 最基础的部分，每一部分都是点到而已，但是这已经够了，你在学习的是一门计算机的语言，和学英语是一样的道理，重要的在于实践，往往很多时候我们无法动手做的原因在于对整个流程不清楚，你知道了一些基础和流程，就可以通过 google, github, stackoverflow, 还有 php 的官方文档来开启和深入你的 php 生涯了，实践很重要，尤其是语言，像我读大学的时候英语一直很差，后来自己开办了个老外学普通话的机构，说的多了，写的多了，自然而然的英文水平就提高了些。
+上面是 PHP 最基础的部分，每一部分都是点到而已，因为每一个点如果要深入都能挖掘出很多的东西，但是初期来说，上面这点知识够了，你在学习的是一门计算机的语言，和学英语是一样的道理，重要的在于实践，往往很多时候我们无法动手做的原因在于对整个流程不清楚，你知道了一些基础和流程，就可以通过 google, github, stackoverflow, 还有 php 的官方文档来开启和深入你的 php 生涯了，实践很重要，尤其是语言，像我读大学的时候英语一直很差，后来自己开办了个老外学普通话的机构，说的多了，写的多了，自然而然的英文水平就提高了些。
 
 当然，当你已经开发了几个项目后，你就得回头来系统的补下基础了，这个基础包括计算机系统原理，算法和数据结构，C语言等。
 
@@ -517,7 +513,673 @@ require 'index.view.php';
 
 ## 接触 Mysql
 
-未完 。。。
+一个 Web 站点上会有很多的数据，我们可以把这些数据放在文件中，像我博客的这些文章，但是如果数据会经常需要增删改查，那就需要一个关系型的数据库来保存它们。我们经常使用的数据库管理系统有 `SQLite, Mysql, NOSQL, MongoDB`， 可以根据自己的需要来选择，不过 `Mysql` 和 `PHP` 基本已经成了黄金搭档了，比如说我们要开发一个 “待办事项列表”给自己使用，我们需要把这些 ”待办事项“ 存放在数据库中，我们用 `Mysql` 来做一下：
+
+### Mac 上用 Brew 安装 Mysql
+首先需要安装Mysql, 在 `Mac` 上可以通过 `brew` 来安装 `Mysql`， 具体的看我这篇文章中的安装 Mysql 的部分
+
+> [全新安装Mac OS Sierra (10.12)并使用HomeBrew安装ZSH + MNMP (Mac + Nginx + Mysql + Php) 开发环境](http://blog.zhoujiping.com/notes/mnmp.html)
+
+### 登录 Mysql 数据库
+开启`mysql`服务后，在终端通过`mysql -u 用户名 -p 密码` 就可以登录到`mysql`中
+
+```bash
+    $ mysql -u root -p           
+    Enter password: 
+    Welcome to the MySQL monitor.  Commands end with ; or \g.
+    Your MySQL connection id is 4
+    Server version: 5.7.17 Homebrew
+
+    Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+
+    Oracle is a registered trademark of Oracle Corporation and/or its
+    affiliates. Other names may be trademarks of their respective
+    owners.
+
+    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+    mysql> 
+```
+
+### 查看 Mysql 内所有数据库
+
+进入 `Mysql` 数据库中， 可以通过 `Sql` 语言来操作了，先通过 `show databases;`看一下我们目前有哪些数据库存在:
+
+```bash
+mysql> show databases;
+
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| zjpblog            |
++--------------------+
+```
+
+### 创建一个新的数据库 mytodo
+
+下面来创建一个数据库存放我们的“待办事项”，取名为 `mytodo`, 通过 `create database mytodo;` 来创建
+
+```bash
+# 下面的 mysql> 代表目前你处于 mysql 的环境中
+# create database mytodo;  是sql语句，不是命令，不要忘记了分号
+mysql> create database mytodo; 
+```
+
+### 切换当前数据库
+
+现在通过 `show databases;` 就能看见刚才创建的 `mytodo` 数据库了，当你要具体操作某一个数据库的时候，你得通过`use 数据库名` 切换到你要操作的数据库，`mysql`数据库管理系统内有这么多的数据库存在，你如果不指定用哪一个，那就乱套了。
+
+```bash
+    mysql> use mytodo;
+    Database changed
+```
+
+### 查看所有数据表 table
+
+一个数据库会内有很多的数据表 `tables`, 通过`show tables;` 可以查看所有的数据表：
+
+```bash
+mysql> show tables;
+Empty set (0.00 sec) # 目前我们还没有建立表，是空的
+```
+
+### 创建数据表
+
+你可以把数据库想象成一个文件夹，把数据库中的表想象成是 `excel` 文件，在每个`excel`文件内，你会给每个列取个名字，然后对应的填上你的数据，数据表也一样，只不过它的列叫做 “字段”,同时你在创建的时候需要指定每个“字段”内可以存放的值的类型，我们来创建一个 `todos` 的表。
+
+```bash
+mysql> create table todos (id     integer  PRIMARY KEY AUTO_INCREMENT, description text     NOT NULL, completed boolean NOT NULL);
+
+#注解： create table todos (字段名   整形     主键         自增长         ,  字段名2      文本型    不为空); 
+```
+字段 `id`, 有一个`PRIMARY KEY`的属性，代表它是主键，是唯一的，`AUTO_INCREMENT` 是自增长的意思，你插入数据到表中的时候，不用手动为`id`添加值，它是自动生成。
+
+### 查看数据表内所有字段的属性
+
+通过 `describe 数据表名;` 可以查看这个表内每个字段的具体属性：
+```bash
+mysql> describe todos;
++-------------+------------+------+-----+---------+----------------+
+| Field       | Type       | Null | Key | Default | Extra          |
++-------------+------------+------+-----+---------+----------------+
+| id          | int(11)    | NO   | PRI | NULL    | auto_increment |
+| description | text       | NO   |     | NULL    |                |
+| completed   | tinyint(1) | NO   |     | NULL    |                |
++-------------+------------+------+-----+---------+----------------+
+```
+### 插入数据到 todos 表中
+
+```bash
+mysql> insert into todos (description, completed) values('写博客', false);
+```
+### 查询表中的所有数据
+
+```bash
+mysql> select * from todos;
++----+-------------+-----------+
+| id | description | completed |
++----+-------------+-----------+
+|  1 | 写博客      |         0 |
++----+-------------+-----------+
+```
+> 更多关于 `sql` 语句，访问： https://www.w3schools.com/sql/default.asp ， 可以快速浏览一下，熟悉点关键字，用的时候再去google。
+
+###  用Mysql客户端管理工具来管理Mysql数据库
+
+通常很少真有人一直在命令行去操作数据库，在 `Mac` 上可以使用 `Sequel pro` 来管理， 在 `Windows` 上可以用 `Navcat`
+
+> Sequel pro - http://www.sequelpro.com/  免费, 简单易用，本人一直用这个，只支持 `Mac` 系统
+> Querious - http://www.araelium.com/querious/ 只支持 `Mac` 系统，收费
+> Navcat - https://www.navicat.com.cn  收费，支持`Mac`, `Windows`, `Linux`
+
+## 接触 PHP 的类和对象
+
+现代的 PHP 开发都是基于面像对象的，可以将任何东西都看作对象，我们可以创建一个或者多个对象，有些对象会有一些相同的特征，所以我们会基于一个模版来创建这些对象，而这个模版我们可以称呼为“类”, 我们用关键词 "class" 即可以声明一个类，如声明一个“待办事项的类”
+
+```php
+class Task 
+{
+    //
+}
+```
+
+我们把 `index.php` 中的代码改成下面这样：
+
+```php
+<?php 
+
+require 'functions.php';
+
+class Task 
+{
+    protected $description;
+
+    protected $completed = false;
+
+    public function __construct($desc)
+    {
+        $this->description = $desc;
+    }
+}
+
+$taskOne = new Task('写博客');
+$taskTwo = new Task('中午去幼儿园打小男孩');
+
+dd([$taskOne, $taskTwo]);
+
+require 'index.view.php';
+```
+
+上面的 `Task` 就是一个类，我们可以通过 `new 类名` 来创建对象，像上面我们通过`new Task('xx')` 创建了两个任务。我们希望在创建任务对象的时候能将具体的任务内容也生成，PHP 给每个类都提供了一个构造方法 `__construct`,这个方法会在你创建一个对象的时候自动调用，php给我们提供的类式这样的方法我们叫做魔术方法，魔术方法都是以 `__` 开始的。
+
+我们再来看 `Task`, 在这个类中有 `$description, $completed ` 两个变量， 有`__construct` 这个函数，不过再类中，我们把像上面这样的变量叫做类的“属性”，把函数叫做类的“方法”。
+
+在 `$description` 前面的 `protected` 这个关键词是用来限定访问权限的, 一共有三种权限：
+
+> private - 使用了改修饰的属性和方法只能在类的内部调用;
+> protected - 使用了改修饰的属性和方法只能该类和该类的子类中调用
+> public - 使用了改修饰的属性和方法只能在类的内外部或者子类中都可以调用
+
+`$this->description = $desc;`  `$this` 代表当前对象，如果是`$taskOne`调用 description， `$this` 就代表`$taskOne` 这个对象， 如果是`$taskTwo`调用 description， `$this` 就代表`$taskTwo` 这个对象。这里的 `->` 符号就是对象调用属性和方法的操作符。
+
+上面说到 `$compoleted` 是被 `protected` 修饰的，所以我们不能在类外部直接调用它，我们现在来编写一个方法：
+
+```php
+public  function isComplete()
+{
+    return $this->completed;
+}
+```
+
+这样就可以通过 `$taskOne->isComplete()` 来获取`$completed`的值了，为什么不直接将`$compoleted`　的访问权限改成 public 呢？ 主要是为了安全性的考虑，最好不要预先就将属性设置成`public`, 这样任何对象就都能访问它或者去尝试修改它的值了，将属性设置成`private 或者 protected`, 然后通过一些方法来访问和修改属性，你可以在方法中编写一些处理或过滤的功能，这样就会好很多。基于这个想法，那么对象如果要修改`$completed`的值，那就需要下面的方法:
+
+```php
+    public function complete()
+    {
+        $this->completed = true;
+    }
+```
+
+> 上面的代码可到 https://github.com/zhoujiping/build-your-own-php-framework 查看第一次提交的代码
+
+## 通过 `PDO` 对象连接数据库
+
+### 创建 PDO 资源对象
+
+我们先在 `todos` 表中插入点数据
+
+![task数据库数据](/images/php/step_1/4.jpg)
+
+然后创建 `PDO` 资源对象，创建对象很多时候也叫“实例化一个对象”。
+
+```php
+// mysql - 告诉pdo我用的是mysql数据库
+// host=127.0.0.1 地址，你的mysql装在哪个服务器上，IP或地址是多少，我们跑在本地，所以是127.0.0.1或localhost
+// dbname - 数据库名
+// username - 登录mysql的用户名
+// my_password - 登录mysql的密码
+
+$pdo = new PDO('mysql:host=127.0.0.1;dbname=mytodo', 'username', 'my_password');
+```
+`PDO` 是 PHP 提供的一个用来连接和操作数据库的类，我们先创建一个`$pdo`资源对象，这里会存在一个问题，就是很有可能因为数据库软件没有运行，或者是用户名和密码输错而导致异常，这里我们需要通过`try`和`catch`来处理异常.
+
+### PDO连接不上数据库的异常处理
+
+```php
+try {
+    $pdo = new PDO('mysql:host=127.0.0.1;dbname=mytodo', 'username', 'my_password');
+} catch (PDOException $e) {
+    die('Sorry, could not connect');
+}
+```
+`try` 内的代码始终会运行一遍，如果出错了，会被抛出异常，该异常会被 `catch` 捕获住， 当捕获到异常，我们使用`die()`让程序停止运行。
+
+### 通过 pdo 获取数据表 todos 中的内容
+
+将 `index.php` 改成：
+
+```php
+<?php 
+
+try {
+    $pdo = new PDO('mysql:host=127.0.0.1;dbname=mytodo', 'username', 'your_password');
+} catch (PDOException $e) {
+    die('Sorry! Could not connect');
+}
+
+$statement = $pdo->prepare('select * from todos');
+
+$result = $statement->fetchAll(PDO::FETCH_OBJ);
+
+var_dump($result);
+```
+
+当我们正确的连接上数据库，会返回一个资源对象，接着需要预处理 `sql` 语句
+
+```php
+$statement = $pdo->prepare('select * from todos');
+```
+### sql 注入之类的安全问题
+使用 `prepare` 的好处是为了避免一些 `sql` 注入的安全问题，这里不展开说，简单的说下吧！正常开发的时候我们的`sql`语句的部分内容是由用户传递过来的，如：
+
+```sql
+select * from todos where completed = ?;
+```
+
+比如这里是希望用户通过传`1` 或者 `0` 来获取完成或者未完成的任务列表，但是往往用户不会这么做，如果用户输入`1 or true`,如果不做处理，就会把所有的任务都读取出来了。所以当你看一些资料的时候要自己鉴别下，如果使用`mysql_connect()`函数去连接数据库，那是很不安全的，还好高版本已经不支持这个函数了，所以安装 `php` 版本的时候也最好安装最新的，比如现在一定要用 `php7` 了。
+
+接着，我们可以执行预处理过的 sql 语句，然后获取所有的任务，但是我们可以通过传递 `PDO::FETCH_OBJ`参数来过滤输出内容，只要获取当中的对象.
+
+```php
+$statement->execute();
+
+$results = $statement->fetchAll(PDO::FETCH_OBJ);
+```
+现在使用 `var_dump($results)` 打印出 `$results` 的值
+
+![pdo获取数据库的值](/images/php/step_1/5.jpg)
+
+### 对象和关系的映射
+
+`$results` 是一个包含的是两个php标准对象(stdClass)的数组， 但是如果我们在获取对象的时候能得到两个`Task` 对象， 将对象和数据表的关系对应上，那之后开发就方便多了，我们来改写一下`$results = $statement->fetchAll(PDO::FETCH_OBJ);`
+
+```php
+$tasks = $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
+```
+通过设置 `PDO::FETCH_CLASS`参数，可以返回一个具体的对象，`Task` 指定返回的具体对象，它是类`Task`的对象，现在我们还没有'Task'类，我们去新建一个`Task.php`的文件
+
+```php
+<?php
+
+    class Task 
+    {
+        public $description;
+
+        public $completed;
+        
+    }
+```
+在 `index.php` 中 `require 'Task.php'`, 现在 `var_dump($tasks)`, 如下：
+
+![ORM](/images/php/step_1/6.jpg)
+
+现在我们在 `Task` 类中新声明的任何属性和方法，都能够被 `$tasks` 内的对象调用了，从而实现了对象和关系映射（ORM）的雏型。
+
+### 现在的文件和代码罗列
+
+再看下现在已有的文件和代码：
+
+`Task.php` 文件
+
+```php
+<?php
+
+class Task 
+{
+    public $description;
+
+    public $completed;
+}
+```
+
+`index.php` 文件
+
+```php
+<?php 
+
+require 'Task.php';
+
+try {
+    $pdo = new PDO('mysql:host=localhost;dbname=mytodo', 'username', 'my_password');
+} catch (PDOException $e) {
+    // 这里直接打印出具体的出错信息
+    die($e->getMessage());
+}
+
+$statement = $pdo->prepare('select * from todos');
+$statement->execute();
+$tasks = $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
+
+require 'index.view.php';
+```
+
+`index.view.php` 文件
+
+```php
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>index.view.php</title>
+</head>
+<body>
+    <ul>
+        <?php foreach ($tasks as $task) : ?>
+             <li>
+                <?php if ($task->completed) : ?>
+                    <strike> <?= $task->description; ?> </strike>
+                <?php else : ?>
+                    <?= $task->description; ?>
+                <?php endif; ?>
+             </li>
+        <?php endforeach; ?>
+    </ul>
+</body>
+</html>
+```
+
+`functions.php` 文件
+
+```php
+<?php
+
+function dd($data)
+{
+    echo '<pre>';
+    die(var_dump($data));
+    echo '</pre>';
+}
+```
+
+### 初步优化代码
+
+现在回头看 `index.php` 中的连接数据库和获取`todos`表中所有数据的代码，它们很凌乱，另外每次在别的文件中调用还需要重新写一遍，我们先把连接数据库的部分写成一个函数，放在`functions.php` 中
+
+```php
+function connectToDb()
+{
+    try {
+        // 实例化PDO，并将pdo的资源对象返回给调用者
+        return new PDO('mysql:host=localhost;dbname=mytodo', 'username', 'my_password');
+    } catch (PDOException $e) {
+        die($e->getMessage());
+    }
+}
+```
+在 `index.php` 中调用这个函数
+
+```php
+
+<?php 
+
+require 'functions.php';
+require 'Task.php';
+
+    // 通过调用 connectToDb() 获取其返回的 PDO 资源对象，并赋值给 $pdo
+    $pdo = connectToDb();
+
+    $statement = $pdo->prepare('select * from todos');
+    $statement->execute();
+    $tasks = $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
+
+    require 'index.view.php';
+```
+
+`index.php` 中的获取所有任务的三条代码也将其写成函数，放到`functions.php` 中
+
+```php
+    function fetchAllTasks($pdo)
+    {
+        $statement = $pdo->prepare('select * from todos');
+        $statement->execute();
+        return $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
+    }
+```
+`index.php` 中调用 `fetchAllTasks($pdo)`
+
+```php
+<?php 
+
+    require 'functions.php';
+    require 'Task.php';
+
+    $pdo = connectToDb();
+    $tasks = fetchAllTasks($pdo);
+
+    require 'index.view.php';
+```
+
+### 重构以上优化后的代码
+
+上面优化的代码貌似还可以了，但是上面的代码可以说属于面向过程的，只注重实现功能，代码的可读性和可维护性，易用性都很差，现代的 php 都是面向对象编程了，所以我们有必要对代码进行重构，代码重构的意思是在不影响功能的前提下对现有代码的结构进行改变，对类，方法进行重命名，对代码、接口进行抽取，对字段进行重新封装等。
+
+我们在看很多老外写的代码可以发现，他们的代码里一般会定义大量的类、接口、方法，类与类，类与接口之间很多是继承和实现的关系，方法的代码行数很少，超过20行代码的方法不多，看他们的代码感觉最多的就是方法之间的调来调去，不像我们很多人的代码，一个方法下来几十上百甚至两三百行都是最基本的语句构成，很少调用自己的方法。两相比较，可以看出，前者在结构上更清晰，通过类视图就可看出设计意图，并且总的代码量少于后者，而后者代码量庞大，代码冗余现象严重，结构不清晰，很难维护。
+
+我们主要来重构下面的两个函数:
+
+```php
+$pdo = connectToDb();
+$tasks = fetchAllTasks($pdo);
+```
+
+比如说，通常我们不应该编写 `fetchAllTasks()` 这样的函数，这种函数基本没法复用，比如说想获取所有的评论呢？是不是也要写个`fetchAllComments()` 的函数？ 这样明显就有问题了。
+
+上面的两个函数都是作用在数据库的，那么我们先建立一个`database`的文件夹，然后看`connectToDb()`函数,它的作用在于连接数据库 `Connect to Database`。
+
+基于面向对象的编程，我们会需要一个类，然后使用类的一个方法去连接数据库，类名通常是一个名词，方法可以是一个动作，用英文说大只就是 `make a database connection`, 好了，那么我们就在`database`文件夹中创建一个 `Connection.php` 的文件，在当中声明一个`Connection` 的类， 并且它有一个`make()`的方法。
+
+```php
+<?php 
+
+class Connection
+{
+    public static function make()
+    {
+        //code
+    }
+}
+```
+> 类名的编写规则才用大驼峰法，也就是所有的英文字母的首字母都大写。
+
+这里我们将`make()` 方法设置成静态的`(static)`, 静态方法可以用类名直接调用，不用实例化对象调用，如果不采用静态方法，我们需要这么调用：
+
+```php
+$connection = new Connection;
+$connection->make();
+```
+而静态方法，是这么被调用的
+
+```php
+Connection::make();
+```
+
+对于静态方法的使用，通常情况下需慎用，它可能会增大内存的开销，不过在这里的这种情况，使用静态方法我觉得还挺不错的。我们把这个类完善下
+
+```php
+<?php 
+
+    class Connection
+    {
+        public static function make()
+        {
+            try {
+                return new PDO('mysql:host=localhost;dbname=mytodo', 'username', 'my_password');
+            } catch (PDOException $e) {
+                die($e->getMessage());
+            }
+        }
+    }
+```
+
+现在在 `index.php` 中，就可以调用它了
+
+```php
+<?php 
+
+    require 'functions.php';
+    require 'database/Connection.php';
+    require 'Task.php';
+
+    $pdo = Connection::make();
+    $tasks = fetchAllTasks($pdo);
+
+    require 'index.view.php';
+```
+
+下面再来看`fetchAllTasks()`这个函数，刚才也说了这个函数不具备复用性，我们现在需要一个类，这个类最好能提供一些方便好用的查询方法给我们，它能将一些常用的`SQL`语句进行封装，这样在以后开发的时候我就不用再去写那些原生的，难于阅读和维护的原生`sql`语句, 既然这样，我们就需要重新构建一个查询的类，我们把这个取名为 `QueryBuilder`， 目前它还应该有一个`selectAll()`的方法。 在`database`文件夹下创建 `QueryBuilder.php`的文件
+
+```php
+<?php
+
+    require 'Connection.php';
+
+    class QueryBuilder
+    {
+        public function selectAll($table, $model)
+        {
+            $statement = Connection::make()->prepare("select * from {$table}");
+
+            $statement->execute();
+
+            return $statement->fetchAll(PDO::FETCH_CLASS, $model);
+        }
+    }
+```
+`index.php` 中的代码如下
+
+```php
+<?php 
+
+    require 'functions.php';
+    require 'database/QueryBuilder.php';
+    require 'Task.php';
+    
+    $tasks = (new QueryBuilder)->selectAll('todos', 'Task');
+
+    require 'index.view.php';
+```
+
+现在代码可以跑通， 但是`QueryBuilder`类中的这句代码好象还是有问题
+
+```php
+    $statement = Connection::make()->prepare("select * from {$table}");
+```
+
+这里的`Connection::make()`是硬编码式的写在这里的，如果`Connection`类修改了`make()`方法的名称，那么这里就会出错，同时在代码阅读体验上太差，不能一眼看出`Connection::make()`返回的结果是什么，还是需要和以前一样使用变量`$pdo`比较好。
+
+```php
+    $statement = $pdo->prepare("select * from {$table}");
+```
+
+这个`$pdo`变量在调用的时候该怎么传进来呢？放在`selectAll()`参数内? 这样不好，以后如果编写其他的方法还需要重复的传进来，嗯，`QueryBuilder` 类必须要依赖于 `PDO` 的一个资源对象，我们给`QueryBuilder`类定义一个 `PDO` 对象的属性，当`QueryBuilder`创建的时候自动给这个属性赋值,用构造函数可以解决，再改一下`QueryBuilder`类
+
+```php
+<?php
+
+    class QueryBuilder
+    {
+        protected $pdo;
+
+        public function __construct(PDO $pdo)
+        {
+            $this->pdo = $pdo;
+        }
+
+        public function selectAll($table, $model)
+        {
+            $statement = $this->pdo->prepare("select * from {$table}");
+
+            $statement->execute();
+
+            return $statement->fetchAll(PDO::FETCH_CLASS, $model);
+        }
+    }
+```
+
+`index.php` 中的代码
+
+```php
+<?php 
+
+    require 'database/Connection.php';
+    require 'database/QueryBuilder.php';
+    require 'Task.php';
+
+    $pdo = Connection::make();
+
+    $query = new QueryBuilder($pdo);
+
+    $tasks = $query->selectAll('todos', 'Task');
+
+    require 'index.view.php';
+```
+
+这样会好一些，上面这种做法其实就是依赖注入，在很多的框架中都会使用到。现在`index.php` 还是太杂了，做的事太多了，像创建`PDO`和实例化查询构建器这种都属于引导程序，我们把它们独立出来，在根目录建立`bootstrap.php`
+
+```php
+<?php
+
+    require 'database/Connection.php';
+    require 'database/QueryBuilder.php';
+
+    return  new QueryBuilder(
+        Connection::make()
+    );
+```
+再更改下`index.php`
+
+```php
+<?php 
+
+    $query = require 'bootstrap.php';
+
+    require 'Task.php';
+
+    $tasks = $query->selectAll('todos', 'Task');
+
+    require 'index.view.php';
+```
+
+差不多就先这样重构吧！ 问题还是有，比如说`$tasks = $query->selectAll('todos', 'Task');` 这句就不够语义化，暂时先把`Task`这个参数去掉吧。
+
+## 查阅具体分支的代码
+
+这部分的代码在 https://github.com/zhoujiping/build-your-own-php-framework 的 `refactor` 上，你可以按下面的方法进行查阅。
+
+```bash
+# 克隆代码到本地
+git clone git@github.com:zhoujiping/build-your-own-php-framework.git
+# 切换到 refactor 分支
+git checkout refactor
+```
+
+未完。。。。待续。。。。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

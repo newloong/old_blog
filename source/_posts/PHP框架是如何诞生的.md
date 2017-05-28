@@ -1147,14 +1147,346 @@ git clone git@github.com:zhoujiping/build-your-own-php-framework.git
 git checkout refactor
 ```
 
-未完。。。。待续。。。。
+## 使用配置文件
 
+我们现在是把连接数据库的用户名和密码以硬编码（hard code, 写死的意思）的方式放在`Connection`类中，这样做既不方便管理，同时也不安全，我们来建立一个`config.php`的配置文件， 在里面定义一个数组来存放这些配置
 
+```php
+<?php 
 
+     return [
+        'database' => [
+            'name'          => 'mytodo',
+            'username'      => 'username',
+            'password'     => 'my_password',
+            'connection'    => 'mysql:host=127.0.0.1',
+            'options'       => []
+        ]
+     ];
+ ```
 
+ 将 `Connection.php` 更改下
 
+ ```php
+ <?php 
 
+    class Connection
+    {
+        public static function make($config)
+        {
+            try {
+                return new PDO(
+                    $config['connection'] .';dbname=' . $config['name'],
+                    $config['username'],
+                    $config['password'],
+                    $config['options']
+                );
+            } catch (PDOException $e) {
+                die($e->getMessage());
+            }
+        }
+    }
+```
 
+我们给`make()`方法添加了参数，在`bootstrap.php` 中也要更改下
+
+```php
+<?php
+
+    $config = require 'config.php';
+
+    require 'database/Connection.php';
+    require 'database/QueryBuilder.php';
+
+    return  new QueryBuilder(
+        Connection::make($config['database'])
+    );
+```
+
+好了，这样可以跑通，在配置文件中我们加了个`'options'=> []` 的配置，这个是做什么用的呢？这里可以添加一些我们需要的额外配置，比如说 `$tasks = $query->selectAll('todos');
+` 这里如果我们传入一个不存在的数据表，按目前的代码，运行后没有任何的提示，我们把配置文件中的`options`设置下
+
+```php
+    'options'       => [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]
+```
+
+现在我们如果查询空表的话就能显示错误信息了，如下
+
+```
+Fatal error: Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mytodo.todoss' doesn't exist in /Users/zhoujiping/Code/php-learning/database/QueryBuilder.php:16 Stack trace: #0 /Users/zhoujiping/Code/php-learning/database/QueryBuilder.php(16): PDOStatement->execute() #1 /Users/zhoujiping/Code/php-learning/index.php(5): QueryBuilder->selectAll('todosS') #2 {main} thrown in /Users/zhoujiping/Code/php-learning/database/QueryBuilder.php on line 16
+```
+
+> PDO::ATTR_ERRMODE的更多预设值访问  http://php.net/manual/en/pdo.setattribute.php 可以自己都试下
+
+## 编写路由 Router
+
+我们可以直接通过访问 php 文件的名字来运行 php 文件，我们建立 `about.php` 和 `contact.php`这两个文字，里面写一些 html 的代码， 然后通过 `http://localhost:8888/about.php` 就可以访问了。如果项目很小，就几张页面，而且逻辑不复杂， 这样做是可以的。如果逻辑复杂一点的，这么做就会有点难于维护了。按照现代 PHP 开发的规范，是需要统一入口文件的， 也就是说无论你访问哪一个URI，其实都是通过 `index.php` 这个文件进入的。 
+
+我们需要把现有的文件目录结构再优化下， 像`database` 内的文件，以及`bootstrap.php` 文件，这些都是属于一些核心的文件，我们可以建立一个文件夹叫做 `core`, 然后把`database`文件夹和 `bootstrap.php`放在这里面，然后我们之前也说过要把逻辑和视图分离开来，那么新建一个 `views` 的文件夹专门用来存放视图文件，对于视图文件我们需要规定下命名规则，目前就先统一为 `xxx.view.php` 这样的格式吧，针对逻辑层我们新建一个 `controllers` 的文件夹。在 `controllers`。
+
+到目前为止，我们做了简单的检索生成器`QueryBuiler`, 可以和数据库打交道了，这一块也可以称呼为模型层`Model`, 我们还建立了控制逻辑的层`controllers`, 以及视图层`views`, 已经是往`MVC`这边靠了。
+
+现在优化好的目录如下：
+
+```php
+├── index.php    # 入口文件
+├── config.php   # 配置文件
+├── controllers  # 控制器层，写逻辑的地方
+├── core         # 一些核心文件
+│   ├── bootstrap.php
+│   └── database
+│       ├── Connection.php
+│       └── QueryBuilder.php
+└── views       # 视图层
+    └── index.view.php
+```
+
+按照现在的结构，假设我们现在要访问一个路由为 `/about` 这样的页面，会发生什么事呢？ 首先根据统一入口规则，无论访问什么样的路由，都必须让它首先访问网站根目录下的 `index.php`, 事实上我们访问的`/about` 的路由全名应该是 `/index.php/about` 这样的。后期通过配置`Apache`或是`nginx`隐藏掉路由中的`index.php`,那么我们看见的路由就会变成`/about`了
+
+### 安装 valet 运行环境
+
+> 在Mac系统上，可以安装 `valet` 开发环境，它已经帮我们配置好了这些，安装说明 https://laravel.com/docs/5.4/valet 
+
+先用 `valet` 生成一个 `my-php-framework.dev` 的本地域名，以后就用这个域名来运行。
+
+### 统一入口页面
+
+首先改写下 `index.php` 的内容, 因为是入口文件，所以要引入`bootstrap.php`引导文件
+
+```php
+<?php 
+    //index.php
+
+    $query = require 'core/bootstrap.php';
+
+    die('无论你访问什么url,都会先访问index.php文件');
+```
+
+因为我们改了目录结构， 所以注意也要把`core/bootstrap.php` 中引入文件的路径也改正确, 如果使用 `valet` 的运行环境，现在就达到我们的要求了，比如我访问 `http://my-php-framework.dev/about`, 它会显示出`index.php`中的这句话。
+
+![统一入口页面](/images/php/step_1/7.jpg)
+
+接下来的事，应该是通过路由去找到控制器中对应的文件，控制器处理完逻辑，将数据让视图层来显示出来，我们在`controllers`中建立`about.php`, 在`views`中建立`about.view.php`文件, 下面是`about.php` 中的内容
+
+```php
+<?php
+
+// controllers/about.php
+
+require 'views/about.view.php';
+```
+
+### 路由分发
+现在回到 `index.php` 入口页面，当用户访问`／about` 这条路由的时候，需要运行与`/about`相关的页面代码，我们已经将逻辑代码放在了`controllers/about.php`中了，现在需要程序能够正确的将`controllers/about.php`的内容包含进来运行，我们可以使用关联数组将路由和实际的控制器文件路径对应起来。
+
+```php
+$routes = [
+    'about' => 'controllers/about.php'
+];
+```
+
+当用户访问'/about'的时候，通过这个数组的`about`健就可以拿到`'controllers/about.php'`这个路径了。
+
+我们先把这个路由数组单独放在一个文件中，命名为`routes.php`, 一个项目会有很多的路由存在，不要把它和别的逻辑杂合在一起。
+
+现在要考虑怎么样做出这个路由的功能，基于面向对象的开发思想，我们首先会想到应该会存在一个`$router`的对象，这个对象有一个`define`的方法，将上面的代码改写下，如下：
+
+```php
+$router->define([
+    ''        => 'controllers/index.php',
+    'about'   => 'controllers/about.php',
+    'contact' => 'controllers/contact.php',
+]);
+```
+
+上面多定义了几个路由，自己加上对应的文件，既然需要`$router`的对象， 那应该需要一个`Router`的类，它也应该属于核心文件中的，我们在`core`文件夹中建立 `Router.php` 文件， 并先声明这个对象.
+
+```php
+<?php
+
+    class Router 
+    {
+        protected $routers =[];
+
+        public function define($routes)
+        {
+            $this->routes = $routes;
+        }
+    }
+```
+
+在`bootstrap.php`中我们要通过`require 'core/Router.php';`引入这个`Router.php`的文件,接下来在入口文件中创建`$router`这个对象，并调用`$router-define()`这个方法。
+
+```php
+<?php 
+
+    $query = require 'core/bootstrap.php';
+
+    $router = new Router;
+    
+    // $router调用define的代码都放在了routes.php中了，require进来就可以了。
+    require 'routes.php';
+
+```
+
+到现在我们已经有了`$router`对象了，所有的路由也会在入口文件加载的时候通过`$router->define()`方法被赋值到`$router`的`$routes`属性中，下面我们只需要 `require` 路由对应的控制器类即可。
+
+我们还会需要一个能够通过路由返回控制器类的实际路径的方法，方法就叫做`direct()`吧，先在入口页调用这个方法，然后再去实现它。
+
+```php
+<?php 
+
+    // 加载引导文件，并且获取创建好的 `QueryBuilder` 的对象
+    // 以后对数据库操作可以使用编写好的 `QueryBuilder` 的对象对方法
+    $query = require 'core/bootstrap.php';
+
+    // 创建路由对象
+    $router = new Router;
+
+    // 将自定义的路由赋给 $router 对象的$routes属性
+    require 'routes.php';
+
+    // 这里其实就是包含具体的控制器文件中的代码，因为['about' => 'controllers/about.php']
+    // 这里相当于 require 'controllers/about.php`;
+    require $router->direct('$uri');
+```
+
+接下来去实现`direct()` 这个方法， 在`Router` 类中编写下面的代码：
+
+```php
+<?php
+
+    public function direct($uri)
+    {
+        // 如果数组中存在 $uri 这样的路由, 那么返还对应的值
+        if (array_key_exists($uri, $this->routes)) {
+            return $this->routes['$uri'];
+        }
+        
+        // 不存在，抛出异常，以后这里改成 404 异常
+        throw new Exception('No route defined for this URI');
+    }
+```
+
+我们尝试把入口页面的`require $router->direct('$uri');`的 `$uri` 改成 `about`路由，能够正确的现实 about 的页面， 改成 `contact`, 能够访问 contact 页面了，改成`no-uri` 这样为定义的路由，就会抛出异常，差不多能实现我们的功能了。
+
+### 获取用户输入的 uri
+现在的问题是用户在浏览器输入 `http://my-php-framework.dev/about` 或者是 `http://my-php-framework.dev/contact`, 我们怎么拿到这个 uri呢? 在 php 中有一个 全局的 `$_SERVER` 变量, 我们在入口页面加上`var_dump($_SERVER);` 打印出它的值.
+
+![var_dump](/images/php/step_1/8.jpg)
+
+可以在`$_SERVER['REQUEST_URI']` 中获取我们要的 uri, 不过需要去掉字符串前的 `/`,可以使用 `trim($string)`函数来处理，`trim($string)` 默认去掉 $string 字符串两边的空格，但如果`trim($string, '/')`这样，就可以去掉字段串前后的 `/`  字符。 现在我们可以正确的得 `$uri` 了。
+
+```php
+<?php
+
+    $uri = trim($_SERVER['REQUEST_URI'], '/');
+```
+
+入口页面 `index.php` 代码如下：
+
+```php
+<?php 
+
+    // 加载引导文件，并且获取创建好的 `QueryBuilder` 的对象
+    // 以后对数据库操作可以使用编写好的 `QueryBuilder` 的对象对方法
+    $query = require 'core/bootstrap.php';
+
+    // 获取用户在地址栏输入的 uri 并去除头尾的 / 字符
+    $uri = trim($_SERVER['REQUEST_URI'], '/');
+
+    // 创建路由对象
+    $router = new Router;
+
+    // 将自定义的路由赋给 $router 对象的$routes属性
+    require 'routes.php';
+
+    // 这里其实就是包含具体的控制器文件中的代码，因为['about' => 'controllers/about.php']
+    // 这里相当于 require 'controllers/about.php`;
+    require $router->direct($uri);
+```
+
+### 优化路由功能部分的代码
+
+最基础的路由功能我们已经实现了，我们把入口页面的代码再优化下，我们理一下，我们其实是加载`routes.php`文件，然后返回其内数组的健所对应的值，我们写一句可读性好点的代码：
+
+```php
+<?php
+    // 链式调用
+    require Router::load('routes.php')
+                  ->direct($uri);
+```
+
+这里的`Router::load('routes.php')`的功能是将`routes.php`中的数组赋给`$router->routes`属性，然后返回`$router`对象，`$router`再调用`direct($uri)`方法。看一下 `Router` 类中的 `load` 方法:
+
+```php
+    public static function load($file)
+    {
+        $router = new static;
+        
+        // 调用 $router->define([]);
+        require $file;
+        
+        // 注意这里，静态方法中没有 $this 变量，不能 return $this;
+        return $router;
+    }
+```
+
+## 将 Request 分离出来
+
+我们再来看 `$uri = trim($_SERVER['REQUEST_URI'], '/');`  这句代码，这种代码放这里的可读性太差了，任何人读到这里都会卡顿，如果把这句话换成 `Request::uri()` 那就语义话了。
+这样入口文件就只有两句代码了.
+
+```php
+<?php 
+
+$query = require 'core/bootstrap.php';
+
+require Router::load('routes.php')
+    ->direct(Request::uri());
+```
+
+我们来编写在`uri()` 方法， 在`core`下建立一个`Request.php`的类文件
+
+```php
+<?php
+
+class Request
+{
+    public static function uri()
+    {
+        return trim($_SERVER['REQUEST_URI'], '/');
+    }
+}
+```
+
+好了，别忘记了在`bootstrap.php`中引入`Request.php`这个类。
+
+## 优化下 bootstrap.php 文件中的变量 $config
+
+看这句代码 `$config = require 'config.php';` 因为我们现在才用统一入口页面了，所以一个站点就是一个应用(APP), 因此这里的 `$config` 变量的生命周期很长，你会发现你再控制器类中可以使用它，在视图文件中也可以使用它，那么我们把这类的变量都放在一个`$app`的数组中应该会好一些,如下：
+```php
+<?php
+// bootstrap.php
+
+    $app = [];
+
+    $app['config'] = require 'config.php';
+
+    require 'core/Router.php';
+    require 'core/Request.php';
+    require 'core/database/Connection.php';
+    require 'core/database/QueryBuilder.php';
+
+    return  new QueryBuilder(
+        Connection::make($app['config']['database'])
+    );
+```
+## 重构后的代码和添加路由功能的版本 router
+
+我把上面的代码放在了 `router` 分支上，使用`git checkout router` 可以切换到上面的代码.
 
 
 

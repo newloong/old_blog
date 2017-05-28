@@ -8,6 +8,8 @@ categories:
 
 你好，我是“老周”，这是新博客的开篇文章，如果我从没有学习过`PHP`开发，但是我会一些`HTML`和`CSS`，我听说过一些`PHP`框架，但是我却没有使用过这些框架，我该怎么进入`PHP`开发者的行列呢？还有为什么学习了原生的`PHP`，我还要去学习那些框架呢？这些框架究竟有什么好处？为什么会产生框架？我最初学习`PHP`的时候上面的问题都想过，纠结啊！这篇文章应该会比较长，我打算从`PHP`的基础开始罗列，做一个简单的页面，然后慢慢演化成框架！嗯，这样会把框架是如何诞生的这个问题给理清，对于今后学习框架会有好处！
 
+另外如果你正在学习Laravel, 或者已经开始使用了Laravel,但是对laravel的思想还不是很了解的话，这篇文章也许也会适合你。有基础的看右边的导航条，从第15点开始看。
+
 <!--more-->
 
 ## 安装PHP运行环境
@@ -943,7 +945,7 @@ require 'Task.php';
     require 'index.view.php';
 ```
 
-### 重构以上优化后的代码
+## 重构以上优化后的代码
 
 上面优化的代码貌似还可以了，但是上面的代码可以说属于面向过程的，只注重实现功能，代码的可读性和可维护性，易用性都很差，现代的 php 都是面向对象编程了，所以我们有必要对代码进行重构，代码重构的意思是在不影响功能的前提下对现有代码的结构进行改变，对类，方法进行重命名，对代码、接口进行抽取，对字段进行重新封装等。
 
@@ -1487,6 +1489,174 @@ class Request
 ## 重构后的代码和添加路由功能的版本 router
 
 我把上面的代码放在了 `router` 分支上，使用`git checkout router` 可以切换到上面的代码.
+
+## 视图文件的拆分
+
+通常一张视图文件都会包含一些重复的部分，如头部，底部，导航条等，为方便维护，这些部分都会把它们独立出来，比如我们现在为每个页面添加导航菜单。 在`views`下新建`partials`文件夹，然后先建立一个`nav.php`,用来存放导航条
+
+```html
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/about/zhoujiping">About Zhoujiping</a></li>
+        <li><a href="/contact">Contact</a></li>
+    </ul>
+</nav>
+```
+
+然后在其他的`xx.view.php`视图中通过 `require('partials/nav.php');` 引入进来，同理可用把`head`部分也独立出来。这里不贴代码了。
+
+## CSS和JS文件
+
+网站的css和js以及一些静态的资源文件我们在根目录下建立一个`public`的文件夹，然后分别建立对应的文件夹，其实`index.php`文件后期我们也要放在这里，后期会把网站的根目录指向这里，`css`和`js`文件我们可以通过`gulp`或者`webpack`将其打包后放在这里，这样我们网站的安全性会高很多。这里的文件夹自己建立，然后在`views`页面中引入进来即可。现在看下`index.view.php`页面，是不是清晰了很多, 其实用原生的php加上替代语法写视图文件也可以比较清晰的。我们自己的小项目很多时候并不用去选择框架做，自己搭建一个简单的框架去做，那样是最轻量的，开发效率也还是比较快的。
+
+```php
+
+    <?php require 'partials/head.php'; ?>
+    <?php require 'partials/nav.php'; ?>
+
+    <h1>Home Page</h1>
+
+    <ul>
+        <?php foreach ($tasks as $task) : ?>
+             <li>
+                <?php if ($task->completed) : ?>
+                    <strike> <?= $task->description; ?> </strike>
+                <?php else : ?>
+                    <?= $task->description; ?>
+                <?php endif; ?>
+             </li>
+        <?php endforeach; ?>
+    </ul>
+
+    <?php require 'footer.php'; ?>
+```
+
+> 小问题： 上面的`nav.php`是可以在`head.php`中就包含的，但是通常我更喜欢把它们分开`head.php`基本对应`<head>`部分，我不想把`<body>` 中的也融合进去，有必要的话我会建立`head.php`和`header.php`两个文件，在`header.php`中在包含`nav.php`，或者将`nav.php`的内容直接放在`header.php`中，我感觉文件的命名和内部的内容需要对应，这样可读性会好些。
+
+## php 常用操作数组的函数 `array_filter`, `array_map` 和 `array_colum`
+
+### array_filter - 用回调函数过滤数组中的单元
+
+这三个函数在`laravel`的源码中也用的挺多的，我们来讨论下，首先 `array_filter`，官方说明地址: http://www.php.net/manual/zh/function.array-filter.php 
+
+** 用法： **
+
+```php
+array array_filter ( array $array [, callable $callback [, int $flag = 0 ]] )
+
+// 代码中的写法一般为:
+
+$array_filter_result = array_filter($array, function ($item) { // code });
+```
+
+** 解析：**
+
+依次将 array 数组中的每个值传递到 callback 函数。如果 callback 函数返回 true，则 array 数组的当前值会被包含在返回的结果数组中。数组的键名保留不变。 如果没有提供 callback 函数， 将删除 array 中所有等值为 FALSE 的条目。这句话的意思是 `array_filter($array)` 可以返回值为空，为false
+
+** 举例 **
+
+一个博客的帖子会有发布状态和未发布状态，如下:
+
+```php
+<?php 
+
+ class Post
+ {
+        public $title;
+
+        public $published;
+
+        public function __construct($title, $published)
+        {
+            $this->title = $title;
+
+            $this->published = $published;
+        }
+     }
+
+     $posts = [
+        new Post('My First Post', true),
+        new Post('My Second Post', true),
+        new Post('My Third Post', true),
+        new Post('My Fourth Post', false),
+     ];
+```
+
+下面筛选出未发布的帖子
+
+```php
+ $unPublishedPosts = array_filter($posts, function ($post) {
+    return $post->published === false;
+ });
+ ```
+按照需求代码是上面这样的，优化下:
+
+```php
+ $unPublishedPosts = array_filter($posts, function ($post) {
+    return ! $post->published;
+ });
+
+我们如果打印`$posts`的值，发现是没有改变的，所以`array_filter`是不会改变原数组的值的，所以在回调函数中不要去改变原数组，否则会出现未知错误。
+
+### array_map 为数组的每个元素应用回调函数
+
+** 用法 **
+
+```php
+array array_map ( callable $callback , array $array1 [, array $... ] )
+```
+
+** 说明 **
+
+`array_map()`：返回数组，是为 array1 每个元素应用 callback函数之后的数组。 callback 函数形参的数量和传给 array_map() 数组数量，两者必须一样。 文档地址 http://php.net/manual/zh/function.array-map.php
+
+** 例子 **
+
+如果要把所有的帖子都设置成发布状态，那就可以使用`array_map` 来操作
+```php
+$modifyPosts = array_map(function ($post) {
+    $post->published = true;
+    return $post;
+}, $posts);
+```
+
+`array_map` 很大的一个作用可以用来处理接口返回的数据，比如我想`$published` 返回的值为`1`或`0`可以这样：
+
+```php
+ $modifyPosts = array_map(function ($post) {
+    $post->unpublished ? $post->published = 1 : $post->published = 0;
+    return $post;
+}, $posts);
+```
+
+### array_column — 返回数组中指定的一列
+
+文档 http://php.net/manual/zh/function.array-column.php
+
+比如我想返回所有的帖子标题， 我们可以通过 `array_map()` 来做到这点 
+
+```php
+
+     $titles = array_map(function ($post) {
+        return $post->title;
+    }, $posts);
+```
+
+用`array_column` 就更简单了
+```
+$titles = array_column($posts, 'title');
+```
+> 上面的$title 是针对 public 属性的才有效， 如果是`protected`或`private`属性的，类需要实现 __get() 和 __isset() 魔术方法，具体看文档。
+
+`array_column()` 还可以添加第三个参数，第三个参数会作为 `title` 的 key 返回, 我们在`Post`类中加一个 `author`的属性，然后将代码改成这样：
+
+```php
+    $titles = array_column($posts, 'title', 'author');
+```
+返回的数据中会变成`author`, `title`为值的关联数组。
+
 
 
 

@@ -1,7 +1,7 @@
 ---
 title: 论PHP框架是如何诞生的?
 date: 2017-05-23
-updated: 2017-05-25
+updated: 2017-05-29
 categories:
  - php
 ---
@@ -1530,7 +1530,7 @@ class Request
         <?php endforeach; ?>
     </ul>
 
-    <?php require 'footer.php'; ?>
+    <?php require 'partials/footer.php'; ?>
 ```
 
 > 小问题： 上面的`nav.php`是可以在`head.php`中就包含的，但是通常我更喜欢把它们分开`head.php`基本对应`<head>`部分，我不想把`<body>` 中的也融合进去，有必要的话我会建立`head.php`和`header.php`两个文件，在`header.php`中在包含`nav.php`，或者将`nav.php`的内容直接放在`header.php`中，我感觉文件的命名和内部的内容需要对应，这样可读性会好些。
@@ -1656,6 +1656,153 @@ $titles = array_column($posts, 'title');
     $titles = array_column($posts, 'title', 'author');
 ```
 返回的数据中会变成`author`, `title`为值的关联数组。
+
+## 解决路由中已知的一些问题
+
+开发 web 项目， 表单`form`是肯定少不了的，我们在`index.view.php`上写一个简单的来测试, 先来测试 `GET` 方式
+
+```php
+    <?php require 'partials/head.php'; ?>
+    <?php require 'partials/nav.php'; ?>
+
+    <h1>Submit Your Name</h1>
+
+    <form action="/names" method="GET">
+        <input type="text" name="name">
+        <button type="submit">Submit</button>
+    </form>
+
+    <?php require 'footer.php'; ?>
+```
+
+`routes.php` 中添加上对应的`names` 路由
+
+```php
+<?php
+
+    $router->define([
+        ''                  => 'controllers/index.php',
+        'about'             => 'controllers/about.php',
+        'about/zhoujiping'  => 'controllers/about-zhoujiping.php',
+        'contact'           => 'controllers/contact.php',
+        'names'             => 'controllers/add-name.php'
+    ]);
+```
+
+在控制器中建立`add-name.php`, 先输入 `var_dump($_SERVER)`, 然后测试一下，毫无悬念的出错了
+![路由出错](/images/php/step_1/9.jpg)
+
+出错原因是提示找不到路由，这很正常，我们之前的思路是以用户输入的`uri`的`path`为`key`, 去寻找`$router->routes`数组中对应的值是否存在，我们在`Request.php`中的`uri()`方法出了问题。我们现在的方法是这样的。
+
+```php
+    public static function uri()
+    {
+        return trim($_SERVER['REQUEST_URI'], '/');
+    }
+```
+
+我们只是去除了 uri 两端的 `/` 字符， 而现在的 uri 是 `/names?name=zhoujiping` 去除了两头的`/`, 那就变成了`names?name=zhoujiping`, 而我们定义的路由是`names`, 所以肯定是找不到的，现在我们需要提取出正确的 `path`,可以使用 php 的原生函数 `parse_url` 函数的官方文档在这里  http://www.php.net/manual/en/function.parse-url.php 通过 `parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); 就可以得到正确的 `/names` 了，然后再去除两端的 `/`, 关于 `PHP_URL_PATH` 常量的意思，查下文档就行。现在 `uri()` 改成如下：
+
+```php
+
+    public static function uri()
+    {
+        return trim(
+            parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'
+        );
+    }
+```
+
+现在在测试一下，没有问题了，下面把`index.view.php` 中的 `form method` 改成`post`, 然后将`add-name.php`中的内容改成`var_dump($_REQUEST);` 这里的 `$_REQUEST` 可以接受通过`get`或是 `post` 方法传递来的参数值。我们通过表单提交（post 请求方式）后可以正确访问，没有问题，但是我们刷新页面，请求方式变成了`get`, 还是能显示页面，这是我们不希望看见的，我们希望这条路由仅仅提供给 `post` 方式， 而别的请求方式是不能访问的。这一步我们还没有做。
+
+假设在路由页面 `routes.php` 我们的路由可以这么写：
+
+```php
+<?php
+
+    $router->get('', 'controllers/index.php');
+    $router->get('about', 'controllers/about.php');
+    $router->get('about/zhoujiping', 'controllers/about-zhoujiping.php');
+    $router->get('contact', 'controllers/contact.php');
+    $router->post('names', 'controllers/add-name.php');
+```
+
+如果我们的`$router`对象具有`get()`和`post()` 方法，通过这些方法能指定路由的请求方式，那之前的问题就能解决了。解决的思路：
+
+1. 在`$router->routes` 数组中定义 key 为`GET` 和 `POST` 的一维数组
+2. 建立`get` 方法，将`get`方式的路由放进`GET`数组中
+3. 建立`post`方法，将`post`方式的路由放进`POST`数组中
+4. 判断用户访问的路由的请求方式，根据请求方式和 path 对应到`GET`或是`POST`数组中查询 path 对应的值返回。
+
+需要更改的地方及代码如下：
+
+** index.php **
+
+```php
+
+// require Router::load('routes.php')->direct(Request::uri());
+
+// 修改为
+
+require Router::load('routes.php')
+    ->direct(Request::uri(), Request::method());
+```
+
+** Request.php 添加 method() 方法**
+
+```php
+    public static function method()
+    {
+        return $_SERVER['REQUEST_METHOD'];
+    }
+```
+
+** Router.php 删除 define() 方法， 修改 routes 属性， 添加 get() 和 post() 方法， 修改 direct() 方法**
+
+```php
+<?php
+
+    class Router 
+    {
+        protected $routes =[
+            'GET'  => [],
+            'POST' => []
+        ];
+
+        public static function load($file)
+        {
+            $router = new static;
+            
+            // 调用 $router->define([]);
+            require $file;
+
+            return $router;
+        }
+
+        public function get($uri, $controller)
+        {
+            $this->routes['GET'][$uri] = $controller;
+        }
+
+        public function post($uri, $controller)
+        {
+            $this->routes['POST'][$uri] = $controller;
+        }
+
+        public function direct($uri, $requestType)
+        {
+            if (array_key_exists($uri, $this->routes[$requestType])) {
+                return $this->routes[$requestType][$uri];
+            }
+
+            throw new Exception('No route defined for this URI');
+        }
+    }
+```
+
+
+
+
 
 
 

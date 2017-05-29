@@ -46,7 +46,7 @@ index_with_subtitle: false
 menu:
   new: /
   php: /categories/php/
-  php-step-1: /php/PHP框架是如何诞生的/
+  php-step-1: /php/build-your-own-php-framework/
   # about: /about
   # laravel-tutorial: http://blog.zhoujiping.com/laravel-tutorial.html
   #sitemap: /sitemap.xml
@@ -317,7 +317,7 @@ baidu_analytics: e7243fd57a656c8d3bc71a28928e2416
 
 # Disqus
 disqus:
-  enable: true
+  enable: false
   shortname: zhoujiping
   count: false
 
@@ -325,7 +325,7 @@ disqus:
 #hypercomments_id:
 
 # Gentie productKey
-# gentie_productKey: 1e5d33126cb04fa89ffe3aa3e105bb55
+gentie_productKey: 1e5d33126cb04fa89ffe3aa3e105bb55
 
 # changyan
 changyan:

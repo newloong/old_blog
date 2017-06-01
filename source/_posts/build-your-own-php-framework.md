@@ -1,42 +1,48 @@
 ---
 title: 论PHP框架是如何诞生的?
 date: 2017-05-23
-updated: 2017-05-29
+updated: 2017-06-01
 categories:
  - php
 ---
+> 提前说明： 本博客不支持响应式，不支持 IE, 请使用标准浏览器打开。
 
-你好，我是“老周”，这是新博客的开篇文章，如果我从没有学习过`PHP`开发，但是我会一些`HTML`和`CSS`，我听说过一些`PHP`框架，但是我却没有使用过这些框架，我该怎么进入`PHP`开发者的行列呢？还有为什么学习了原生的`PHP`，我还要去学习那些框架呢？这些框架究竟有什么好处？为什么会产生框架？我最初学习`PHP`的时候上面的问题都想过，纠结啊！这篇文章应该会比较长，我打算从`PHP`的基础开始罗列，做一个简单的页面，然后慢慢演化成框架！嗯，这样会把框架是如何诞生的这个问题给理清，对于今后学习框架会有好处！
+你好，我是“老周”，这是新博客的开篇文章，也是“PHP 相关知识技能整理系列” 的第一章，这一章的内容主要是先使用原生的PHP开发出一些简单的页面， 然后将这些页面一步一步的，经过多次重构，最终演变成一个简单的PHP MVC 框架，我们会借鉴 `Laravel` 框架的用法及其思想来慢慢完成我们自己的这个小框架。为什么要借用 `Laravel` 框架的思想，这里就不去做推销了，单凭它是全世界 PHP 开发人员使用最多的一款框架，就值得我们去研究和借鉴了。
 
-另外如果你正在学习Laravel, 或者已经开始使用了Laravel,但是对laravel的思想还不是很了解的话，这篇文章也许也会适合你。有基础的看右边的导航条，从第15点开始看。
+自己写一个框架的目的并不是为了使用它，只是为了让我们能更清楚的了解和使用其他框架，为更好的学习和使用框架打下一个扎实的基础。
 
-<!--more-->
+## 本文章适合的人群
+
+> 虽然这个博客上的文章都是老周自己学习整理使用，但是不免会被老铁们看见，这篇文章针对有一定的 PHP 基础的人员。对于没有 PHP 基础的老铁们可能需要多看几遍，一些欠缺的知识点需要通过 Google 去搜索查阅。
 
 ## 安装PHP运行环境
 
-`PHP`是一个脚本语言，要运行一段`PHP`的脚本，需要安装PHP解析器，如果你使用的是`Windows`操作系统， 那么自己搜索下安装方法，如果你使用的是`Mac`系统，我们可以通过`Homebrew`来安装。
+`PHP`是一种脚本语言，要运行一段`PHP`的脚本，需要通过 PHP 解析器去解析它，如果你使用的是`Windows`操作系统， 那么请自己搜索下安装方法，如果你使用的是`Mac`系统，我们可以通过`Homebrew`来安装。
 
-`Mac`系统自带了版本为 5.6 的`PHP`，可以打开`终端(Terminal)` 输入命令 `php -v` 查看
+`Mac OS` 系统自带了版本为 5.6 的`PHP`，可以打开`终端(Terminal)` 输入命令 `php -v` 查看
 
 ```bash
-$ php -v
 
-PHP 5.6.30 (cli) (built: Feb  7 2017 16:06:52) 
-Copyright (c) 1997-2016 The PHP Group
-Zend Engine v2.6.0, Copyright (c) 1998-2016 Zend Technologies
+    $ php -v
+
+    PHP 5.6.30 (cli) (built: Feb  7 2017 16:06:52) 
+    Copyright (c) 1997-2016 The PHP Group
+    Zend Engine v2.6.0, Copyright (c) 1998-2016 Zend Technologies
 ```
 
-这个版本会比较老，截止到我写这篇文章的时候(2017-5-23)已经是`PHP 7.15`了，我们通过`Homebrew`来安装新的版本,首先安装`Homebrew`。
+这个版本会比较老，截止到我写这篇文章的时候(2017-06-01)已经是`PHP 7.15`版本了，我们通过`Homebrew`来安装新的版本,首先安装`Homebrew`。
 
 ### 在 Mac 系统使用 Homebrew 安装 PHP
 
-首先安装`Homebrew`, 一个`Mac`上的包管理工具，可以进入 Homebrew 的官网： [https://brew.sh/](https://brew.sh) 查看安装方法，很简单，就一句命令:
+首先安装`Homebrew`, 它是一个`Mac OS`上的包管理工具，类式于`centos` 下的`yum`工具，`ubuntu`下的`apt-get`工具。
+
+可以进入 `Homebrew` 的官网： [https://brew.sh/](https://brew.sh) 查看具体的安装和使用方法，安装很简单，就一句命令:
 
 ```bash
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
-安装完后，我们就可以使用了，通常我们要安装一个软件，可能会不知道软件名，所以可以通过`brew search 软件名`搜索，如下：
+安装完 `Homebrew` 后，我们就可以使用它来安装我们需要的其他软件了。通常我们要安装一个软件，可能会不知道具体的软件名，我们可以通过`brew search 大致的软件名`搜索，如我们要安装 `PHP`, 我们可以使用`brew search php` 来搜索与`PHP`相关的软件，如下：
 
 ```bash
 $ brew search php
@@ -48,20 +54,24 @@ $ brew search php
 $ brew install homebrew/php/php70
 ```
 
-### 安装集成的供新手用的 PHP 运行环境
+安装完毕后， 通过`php -v`来查看目前的 `php` 版本是不是 `7.0`, 如果不是， 那么你需要修改系统的环境变量，这一步自己 `Google`。
 
-网络上有很多集成了`Apache, Nginx, Mysql, PHP`的运行环境，下面罗列下，你目前可以使用它们，不过以后你会摒弃它们的，因为现在用的比较多的还是`Homestead`和`Valet`,这两个以后再谈，现在不用关心它们。下面的软件尝试去安装一个吧，下面的内容需要使用`Mysql`，所有自行安装吧。
+### 安装集成的 PHP 开发运行环境
 
-> - ** MAMP ** - http://www.mamp.info 它提供`Mac`和`Windows` 两个版本。
-> - ** WampServer**  - http://www.wampserver.com 它提供`Windows`版本。
-> - ** XAMPP**  - https://www.apachefriends.org 它提供`Mac`, `Windows`和`Linux`版本。
-> - ** 自己折腾MNMP ** - http://blog.zhoujiping.com/notes/mnmp.html 想自己配置，看我这篇文章，目前不建议配
+网上有很多集成了`Apache, Nginx, Mysql, PHP`的运行环境，我们罗列下：
+
+> - ** Homestead ** - https://laravel.com/docs/5.4/homestead 一个预封装的`Vagrant box`，`Mac OS`和`Windows`都可以用，推荐使用。
+> - ** Valet ** - https://laravel.com/docs/5.4/valet 专为 `Mac` 提供的极简主义开发环境,推荐使用。
+> - ** MAMP ** - http://www.mamp.info 它提供`Mac`和`Windows` 两个版本，新手用
+> - ** WampServer**  - http://www.wampserver.com 它提供`Windows`版本，新手用
+> - ** XAMPP**  - https://www.apachefriends.org 它提供`Mac`, `Windows`和`Linux`版本，新手用
+> - ** 自己折腾MNMP ** - http://blog.zhoujiping.com/notes/mnmp.html 会搭建出来就行，不推荐用。
 
 ## 选择一个适合你的编辑器
 
 在开写代码之前，我们需要找一款适合自己的代码编辑器或者是IDE集成开发环境，网上有人说自己喜欢使用记事本来写代码，这纯粹就是“二逼青年找存在感”，就像给你一把铁斧去砍树，你却一定要用石锛, 何苦要做用树叶盖住了屁股却盖不住蛋蛋的原始人呢！
 
-现在的代码编辑器众多，很多编辑器也都能安装自己喜欢的主题，众多的编辑器也导致了大家的评选，这完全没有必要，它只是一个编辑器或者是一个集成开发环境而已，没有必要去争论它，用任何一个都不会提升你的逼格，选择一款你喜欢的即可。为什么这也要唠叨，因为曾经我就深深的陷入选择编辑器还是`IDE`而不能自拔。
+现在的编辑器和`IDE`众多，不要去争论谁好谁坏， 没有意义， 都可以去用一下，喜欢哪个用哪个，但同一公司内最好需要能统一开发环境。
 
 我目前无论是写`PHP`项目，写前端，还是写博客，都是采用`Sublime text`这款编辑器, 官方网站是：https://www.sublimetext.com/ 支持`Windows, Mac, Linux`, 它是一款收费软件， 但是不付钱也可以终身使用，只不过隔半小时会提示你付钱。
 
@@ -69,273 +79,312 @@ $ brew install homebrew/php/php70
 
 > [让代码编辑神器Sublime Text 3 更好的为我们工作 - Sublime Text 3使用小教程](http://blog.zhoujiping.com/tooling/sublime.html)
 
-##  在命令行输出 “Hello World”
+##  开始我们的第一行代码
 
-先打开终端，执行下面的操作, 注意 `$` 这个符号是代表下面的命令是在终端下操作，不要当作命令执行了。
+我们先建立一个文件夹来放置我们的接下来要开发的项目文件，先打开终端，执行下面的操作, 注意 `$` 这个符号是代表下面的命令是在终端下操作，不要当作命令执行了。
 
 ```bash
+
     $ cd                    # 切换到当前用户的主目录
     $ mkdir php-learning    # 建立 php-learning 文件夹
     $ cd php-learning       # 进入 php-learning 文件夹
     $ touch index.php       # 建立 index.php 文件
-    $ subl index.php        # 使用 Sublime Text 打开 index.php 文件
-                            # 如果你不是用 brew 安装的 Sublime Text, 可能无法执行 subl 命令
-                            # 那就自己手动打开 Sublime Text 即可。
+    $ subl index.php        # 使用 Sublime Text 打开 index.php 文件，通过 Homebrew 安装的 sublime 会有这个命令
 ```
 
 在 `index.php` 输入下面的代码
 
 ```php
+
     <?php
 
     echo 'Hello World';
 ```
 
-上面的`<?php` 是 php 脚本的标记符，代表这是一个 php 文件,  `echo` 是 php 的一个语法操作符，打印和输出的意思，`Hello World` 被包含在单引号中，代表它是一个字符串，也可以使用双引号包含它。 使用单引号或是双引号有一定的区别，这个以后再讨论，最后的分号是代表一句代码的结束，不写会报错。
-我们在终端执行 `php index.php`, 就能得到被解析后的结果。
+PHP 文件或者其代码都是以`<?php 或 <?=` 开头， 以`?>` 结尾。但根据`PSR-1`（PSR 是PHP标准规范）规定，纯 PHP 文件必须省略最后的结束标签`?>`。
+
+我们可以通过两种方式来访问 `PHP` 的运行结果，它们分别是“命令行模式”和“浏览器模式”。
+
+### 在命令行输出 "Hello World"
+
+在命令行模式下，我们在终端执行 `php index.php`, 就能得到被解析后的结果。
 
 ```bash
-$ php index.php
 
-Hello World%
+    $ php index.php
+
+    Hello World%
 ```
 
-如果去掉 `index.php` 中的 `<?php` 标识符，php 代码就不会被解析，会被当作字符串输出，自己测试下。也可以尝试不写分号或者是单引号，运行一下代码，看看出错信息都提示了什么。要养成看出错提示（以后看日志）的好习惯，不能一出错就拷贝错误信息去搜索找答案，这样不好。
+如果去掉 `index.php` 中的 `<?php` 开始标识符，`PHP` 代码就不会被解析，会被当作字符串输出，也可以尝试不写分号或者是单引号，运行一下代码，看看出错信息都提示了什么。要养成看出错提示（以后看日志）的好习惯，不能一出错就拷贝错误信息去搜索找答案，这样不好。
 
-## 在浏览器中输出 "Hello World"
+### 在浏览器中输出 "Hello World"
 
 在终端输入 `php -h`， 会列出 `php` 这个命令的用法， 同理在终端要使用其他命令的时候，都可以使用 `命令 -h`
-或者是 `命令 --help` 来查看这个命令大致的用法。 回头来看 `php -h` 的输出信息，会发现下面这样一条
+或者是 `命令 --help` 来查看这个命令大致的用法。 回头来看 `php -h` 的输出信息，会发现下面这样一条:
 
 ```bash
--S <addr>:<port> Run with built-in web server.
+
+    -S <addr>:<port> Run with built-in web server.
 ```
-这句英文的意思是： 启动内置的Web服务器，`<addr>` 是地址，`<port>` 是端口，以后会学习`Linux`， 那时候再了解它们吧！我们可以这么跑
+
+这句英文的意思是： 启动内置的Web服务器，`<addr>` 是地址，`<port>` 是端口，我们来尝试下:
 
 ```bash
-$ php -S localhost:8888
 
-PHP 7.0.18 Development Server started at Tue May 23 23:01:26 2017
-Listening on http://localhost:8888
-Document root is /Users/zhoujiping/Code/php-learning
-Press Ctrl-C to quit.
+    $ php -S localhost:8888
+
+    PHP 7.0.18 Development Server started at Thu Jun  1 16:52:26 2017
+    Listening on http://localhost:8888
+    Document root is /Users/zhoujiping/Code/my-php-framework
+    Press Ctrl-C to quit.
 ```
-自己看下提示信息，好像会明白点什么，现在在浏览器输入 http://localhost:8888 就能看见输出的 Hello World 了。
+
+现在在浏览器输入 http://localhost:8888 就能看见输出的  `Hello World` 了。
 
 ## PHP 的变量
 
-什么是变量？ 为什么需要变量？ 先不考虑这个问题，先来看下变量怎么用， 下面是 `index.php` 改写过的代码。
+什么是变量？ 为什么需要变量？ 先不考虑这个问题，先来看下变量怎么用， 下面是 `index.php` 中改写过的代码。
 
 ```php
+
     <?php
     
-    $greenting = 'Hello World';
-
-    echo $greenting;
+    $name = '周继平';
+    echo 'Hello' . $name;
 ```
 
-上面的 `$greenting` 就是一个变量，它可以用来存储数据，它必须以`$`开头，后面你可以随便取个英文名字，在`php`的变量命名规则中，说到变量不能以数字开头，只能包含数字、字符和下划线等，变量会区分大小写之类的规则，这些不用去刻意去记，比如说，你命名个变量使用数字开头的，如 `$8hello`, 怎么看都会别扭不是，按照下面的方式去写就可以，一看就记住。
+上面的 `$name` 就是一个变量，在 `PHP` 中，它可以用来存储任何类型的数据，它必须以`$`开头，后面你可以随便跟上英文名字，在`PHP`的变量命名规则中，说到变量不能以数字开头，只能包含数字、字符和下划线等，变量会区分大小写之类的规则，这些不用去刻意去记，比如说，你命名个变量使用数字开头的，如 `$8hello`, 怎么看都会别扭不是，按照下面的方式去写就可以，一看就记住。
 
 > - 使用英文去命名你的变量，不要用拼音;
-> - 变量包含两个及以上的英文单词，第二个开始的英文单词首字母大写，如： $studentName 这个命名方法就是传说的小驼峰命名法;
-> - 不要贪图简短，变量名需要有描述意义，因为代码的可读性非常重要;
+> - 变量包含两个及以上的英文单词，第二个开始的英文单词首字母大写，如： `$studentName` 传说的小驼峰命名法；
+> - 变量包含两个及以上的英文单词，也可以用下划线`_`来连接单词，如：`$student_name` 传说中的蛇形命名法；
+> - 不要贪图简短，变量名需要有描述意义，因为代码的可读性非常重要；
 > - 如果变量存储多个数据，需要使用复数形式;
 
-上面的代码运行后会出现相同的结果， 但是这样貌似还不能体现变量的作用，我们再改写下
 
-```php
-    <?php
+我们再来解释下上面中的点号 `.`  它是一个操作符，是用来连接 `PHP` 字符串的，如上面代码的输出就是 `Hello， 周继平`。
 
-        $name = '周继平';
+像 `echo 'Hello，' . $name;` 这句代码，你也可以这些写 `echo "Hello, $name";` 双引号会解析当中的变量 `$name`，虽然执行效率会慢一点点，但是没人会在意这点，你依然可以用双引号的写法。你还可以写的更清晰一点，像这样 `echo "Hello, {$name}";`。
 
-        echo 'Hello，' . $name;
-```
+> 小贴示： 我曾经看见过有人书写过这样的代码： `$name = '张三'; echo "$name是这期的冠军。";` 这样执行的时候肯定会报错，原因是什么呢？ 原因是 $name 前后没有空格，PHP 解析器把 `$name是这期的冠军。` 这一整串作为一个变量了，所以如果出现类式的情况，且汉字之间如果不允许出现空格，且你一定想用双引号的时候，你可以用`{}`将变量包裹起来。如：`$name = '张三'; echo "{$name}是这期的冠军。";` 这样就不会出错了。
 
-上面代码中的点号 `.`  它是一个操作符，是用来连接 php 的字符串的，运行下代码，看下输出就明白这个点号的作用了。
-
-> 像 `echo 'Hello，' . $name;` 这句代码，你也可以这些写 `echo "Hello, $name";`双引号会解析当中的变量 `$name`，虽然执行效率会慢一点点点，但是这点慢可以忽略不计，你依然可以用双引号的写法。你还可以写的更可读一点，像这样 `echo "Hello, {$name}";`。
-
-对于`$name = '周继平';` 这句代码，`周继平`是变量`$name`的值， 这个值是会变动的，比如我想输出 `Hello, 张三`,我们只需要将`$name`的值设置为张三即可，而`张三`这个值，我们可能会从前端传来，也可能从数据库中查询出来，所以有了变量，我们就可以在不改变代码的前提下，得到不同的值。还不明白，没有关系，继续往下看。
+对于`$name = '周继平';` 这句代码，`周继平`是变量`$name`的值， 这个值是会变动的，比如我想输出 `Hello, 张三`，我们只需要将`$name`的值设置为张三即可，而`张三`这个值，我们可能会从前端传来，也可能从数据库中查询出来，所以有了变量，我们就可以在不改变代码的前提下，得到不同的值。
 
 ## 将 PHP 代码嵌入 HTML 中
 
 可以说 PHP 这门语言就是用来开发 Web 应用的， 它能很好的嵌入到 HTML 中（先不要探讨前后端分离）, 我们改写 `index.php`的代码如下:
+
 ```php
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>将PHP代码嵌入到HTML中</title>
-    <style>
-        header {
-            background-color: #f5f8fc;
-            padding: 2em;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>将PHP代码嵌入到HTML中</title>
+        <style>
+            header {
+                background-color: #f5f8fc;
+                padding: 2em;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>
+                <?php
+
+                    $name = '周继平';
+                    echo "Hello, {$name}";
+
+                ?> 
+            </h1>
+        </header>
+    </body>
+    </html>
+```
+
+首先注意上面代码中的 `?>` 结束符，当把 php 代码嵌入到 html 中， php 解析器需要知道 php 代码是从哪里开始到哪里结束的，所以必须书写成对的 `<?php ?>` 开始和结束标识符，我们运行一下上面的代码，结果如下：
+
+![php嵌入到html中](/images/php/step_1/1.jpg)
+
+## 变量传递及全局变量$_GET
+
+我们在访问别人的网站的时候，经常会看见类式下面这样的 `uri`: 
+
+``` html
+
+    localhost:8888?key=value&order=asc
+```
+
+这里的 `key=value` 或者是 `order=asc` 我们叫做`键值对`，也叫`key-value`, 什么叫做键值呢？
+
+> - 所谓的键：其实就是一个标签，一个编号，通过这个编号去对应值(value)。
+> - 所谓的值：值就是数据，就是键所对应的数据。
+
+我们可以通过上面这种方式将键和值都传递给服务器，这些键值会被保存在 PHP 提供的全局变量 `$_GET` 数组中, 如：`$_GET['key']`我值为 value, `$_GET['order']`的值为 asc。 我们可以打印出`$_GET` 的值来看一下， 修改`<header>` 标签内的代码如下：
+
+```php
+
     <header>
         <h1>
             <?php
-
-                $name = '周继平';
-                
-                echo "Hello, {$name}";
-
-                // 注意下面这个php代码结束标识符，忘写会报错
+                var_dump($_GET);
+                // $name = '周继平';
+                // echo "Hello, {$name}";
             ?> 
         </h1>
     </header>
-
-</body>
-</html>
 ```
 
-首先注意上面代码中的 `?>` 标识符，当把 php 代码嵌入到 html 中， php 解析器需要知道 php 代码是从哪里开始到哪里结束的，所以必须书写 `?>` 这个结束标识符， 而如果一个文件中只有纯粹的 php 代码，那就不要书写`?>`结束标识符，当然你在纯 php 文件中书写上`?>`是不会报错的，但是请不要这么做，我们得遵循前人总结的一些规矩，目前大家都在遵守的规矩一般出自 “PSR 规范” （PHP Standards Recommendation）， 我们运行一下上面的代码，结果如下：
+> 注： 上面的 `//` 是 php 语言的单行注释， `//` 之后的代码都不会被执行， `var_dump()` 是 php 提供的内置函数，这个函数可以打印出变量的类型和值。
 
-![php嵌入html](/images/php/step_1/1.jpg)
-
-通常我们看见的网址是这样的：
-
-``` html
-localhost:8888?key=value&order=asc
-```
-这里的`key=value` 或者是 `order=asc` 我们叫做`键值对`，所谓的键：就是你存的值的编号，而值：就是你存放的数据，我们可以通过上面这种方式将值传递给服务器，这些值会被保存在 PHP 提供的全局变量 `$_GET` 中, 我们更改下 `<header>` 标签内的代码
-
-```php
-<header>
-    <h1>
-        <?php
-            var_dump($_GET);
-            // $name = '周继平';
-
-            // echo "Hello, {$name}";
-        ?> 
-    </h1>
-</header>
-```
-
-上面的 `//` 是 php 语言的单行注释， `//` 之后的代码都不会被执行， `var_dump()` 是 php 提供的内置函数，这个函数可以打印出变量的类型和值。
-
-访问： http://localhost:8888/?name=周继平  输出如下：
-
-> array(1) { ["name"]=> string(9) "周继平" }
-
-`array` 代表数组类型， `string` 代表字符串类型， `name` 为健，`周继平` 为值。现在我们就可以把代码改的实用点
-
-```php
-<header>
-    <h1>
-        <?php
-            $name = $_GET['name']; // 获取健(key) 为 name 的值
-
-            echo "Hello, {$name}";
-        ?> 
-    </h1>
-</header>
-```
-现在我们访问 http://localhost:8888/?name=周继平 只要更换掉 `name` 所对应的值，页面上就会打印出你传递的值。
-
-![get方式传递值](/images/php/step_1/2.jpg)
-
-我们将上面的代码再更改的精简点：
-
-```php
-<header>
-    <h1>
-        <?php echo 'Hello, ' . $_GET["name"]; ?>
-    </h1>
-</header>
-```
-像这样的代码 `<?php echo 'Hello, ' . $_GET["name"]; ?>` 可以用`<?=` 来代替
-`<?php echo`, 再来精简下代码
-
-```php
-<header>
-    <h1>
-        <?= 'Hello, ' . $_GET["name"]; ?> 
-    </h1>
-</header>
-```
-
-## 触摸一下 PHP 安全问题
-
-现在我们可以随意的设置`name`的值了，但是用户可能会像下面这样输入:
+如果只访问： http://localhost:8888 结果是 `array(0) { }` 一个空数组，如果访问 uri 的时候并带上键值对, 如：
 
 ```html
-http://localhost:8888/?name=<a%20href="http://blog.zhoujiping.com">周继平的老博客</a>
+
+    http://localhost:8888/?name=zhoujiping&age=3
 ```
-这时候接受的值是一串 html 代码，如果后端不经过处理， 浏览器就会解析它，就会出现这样的情况
+
+多个键值对中间用 `&` 符号连接, 输出的结果如下:
+
+```bash
+
+    array(2) { ["name"]=> string(10) "zhoujiping" ["age"]=> string(1) "3" }
+```
+
+> `array` 代表数组类型， `string` 代表字符串类型， `name` 和 `age`为健，`zhoujiping` 和 `3` 为值。
+
+通过这个方式，我们就可以获取 uri 上的值了，可以通过这些值做一些逻辑处理之类的，我们现在就在页面上显示它们，如下：
+
+```php
+
+    <header>
+        <h1>
+            <?php
+                $name = $_GET['name']; // 获取健(key) 为 name 的值
+                $age = $_GET['age']; // 获取健(key) 为 name 的值
+
+                echo "Hello, {$name}, are you {$age} years old?";
+            ?> 
+        </h1>
+    </header>
+```
+
+现在访问上面的 uri, 页面上会显示 `Hello, zhoujiping, are you 3 years old?`。
+
+## 使用 `<?=` 替代 `<?php echo`
+
+我们将上面的代码写的相对简单点, 如下:
+
+```php
+
+    <header>
+        <h1>
+            <?php echo 'Hello, ' . $_GET["name"] . ', are you ' . $_GET['age'] . ' years old?'; ?>
+        </h1>
+    </header>
+```
+
+当你发现你的代码中出现`<?php echo`连接在一起的时候， 你就可以使用`<?=` 来替代它们，这样会让代码简洁一点, 如下：
+
+```php
+
+    <header>
+        <h1>
+            <?= 'Hello, ' . $_GET["name"] . ', are you ' . $_GET['age'] . ' years old?'; ?>
+        </h1>
+    </header>
+```
+
+## 接触一点 PHP 安全问题
+
+现在我们可以随意的设置 uri 中的`name`值了，但是用户可能会像下面这样输入:
+
+```html
+
+    http://localhost:8888/?name=<a%20href="http://blog.zhoujiping.com">周继平的老博客</a>
+```
+
+这时候 `name` 对应的值是一串 html 代码，如果后端不经过处理， 浏览器就会解析它，就会出现下面这样的情况：
 
 ![代码注入](/images/php/step_1/3.jpg)
 
-上面的`a`标签就会被解析，然后将结果显示在页面，当然仅仅针对目前这个案例，用户即使输入了也只会显示在自己的电脑上，所以并没有什么影响，但是如果我们以后深入的再探讨下，那么问题就会出来了，通过这里我们要知道的是传递给后端的值一定要做验证，这也是为什么很多框架都会有中间件这一层的原因,我们把代码改的稍微安全点，很简单，加一个`htmlspecialchars()`函数即可,关于函数以后再讨论。
+我们传给 `name` 的值是一串 html 代码， 浏览器会解析它们， 然后将结果显示在页面，当然仅仅针对目前这个案例，用户即使输入了也只会显示在自己的浏览器上，所以并没有什么影响，但是如果我们以后深入的再探讨下，那么问题就会出来了，通过这里我们要知道的是传递给后端的值一定要做验证和过滤，这也是为什么很多框架都会有中间件这一层的原因, 我们把代码改的稍微安全点，很简单，加一个 `htmlspecialchars()` 函数即可。
+
+### `htmlspecialchars()`函数解析
+
+htmlspecialchars() 函数， 官方文档的解释是将特殊字符转换为 HTML 实体编码，比如它会将`<` 转变成 `&lt;`, 将`>`转变成`&gt;`等，转化后`name`的值就不是可以运行的 html 代码了，所以运行不了，而在显示的时候，html 又会将这些实体编码重新转化回来，所以在页面上我们并不能看见这些实体编码，但是当你查看 html 源代码的时候，就能看见它们了。
 
 ```php
-<header>
-    <h1>
-        <?php echo 'Hello, ' . htmlspecialchars($_GET["name"]); ?>
-    </h1>
-</header>
-```
-现在再访问刚才的网址， 输出就会变成
 
-```
- Hello, <a href="http://blog.zhoujiping.com">周继平的老博客</a>
- ```
-
-## PHP 显示和逻辑相分离
-
-将 php 代码嵌入到 html 中， 我们就可以在页面中编写任何逻辑代码，比如整个变量，连接数据库，查询数据，验证数据，输出数据等等，如果把所有的东西都放在这个页面中，那在开发和维护上都会非常的痛苦，所以我们需要将它们拆分开来。让每个文件内做最小的事，很多的 php 框架就是这么干的。
-
-比如我们之前写的 `index.php`, 我们就可以将它拆分，我们新建一个 `index.view.php` 的文件，将 html 的代码都放在这里
-
-```php
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>index.view.php</title>
-    <style>
-        header {
-            background-color: #f5f8fc;
-            padding: 2em;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    
     <header>
         <h1>
-            <!-- 这里只输出变量 -->
-            Hello, <?=$name; ?>  
+            <?= 'Hello, ' . htmlspecialchars($_GET["name"]); ?>
         </h1>
     </header>
-
-</body>
-</html>
 ```
 
-将 `index.php` 改写为
+现在再访问刚才的网址， 页面上显示的内容就会像下面这样：
+
+```
+
+    Hello, <a href="http://blog.zhoujiping.com">周继平的老博客</a>
+ ```
+
+## PHP 文件的视图层和逻辑层相分离
+
+将 php 代码嵌入到 html 中， 我们就可以在页面中编写任何逻辑代码，比如定义变量，连接数据库，查询数据，验证数据，输出数据等等，如果把所有的东西都放在这个页面中，那在开发和维护上就会非常的痛苦，所以我们需要将它们拆分开来。将不同的职责放置在不同的 php 文件中，在 `PSR-1` 规范中就已经提到了这点，所以我们也必须要将它们分离出来。
+
+比如我们之前所写的 `index.php`, 我们就需要将它拆分开了，我们需要新建一个 `index.view.php` 的视图文件，视图文件中的 php 代码基本是用于数据输出的，而其余的代码大多是 html 代码, 有些公司会将视图层这一部分全交由前端来完成的，由此也可以看出视图层是不涉及逻辑代码的，我们将 html 代码都拷贝到`index.view.php`中，如下：
 
 ```php
-<?php 
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>index.view.php</title>
+        <style>
+            header {
+                background-color: #f5f8fc;
+                padding: 2em;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>
+                <!-- 这里只输出变量 -->
+                Hello, <?=$name; ?>  
+            </h1>
+        </header>
+    </body>
+    </html>
+```
+
+将 `index.php` 先改写为下面这样：
+
+```php
+
+    <?php 
 
     $name = '周继平';
-
     require 'index.view.php';
 ```
 
-当 `index.php` 被运行时，会通过 `require` 将 `index.view.php` 包含进来， 所以当我们访问： http://localhost:8888/index.php  会得到相同的结果。 这就是最简陋的视图和逻辑分离。
+> 其实上面`index.php`中的代码将声明变量和引入文件放在同一个 php 文件中，也违反了 `psr-1` 的规范，不过我们现在先不去考虑它。
+
+当 `index.php` 被运行时，会通过 `require` 将 `index.view.php` 包含进来，你可以把`require 'index.view.php';`想象成将`index.view.php`中的代码复制到当前文件中，所以当我们访问： http://localhost:8888/index.php  会得到相同的结果。 这就是最简陋的视图层和逻辑层分离。
 
 ## 索引数组
 
 如果出现这样一个情况，我们需要输出几个人的名字，如果按照之前的做法我们会这么写：
 
 ```php
+
     // 在 index.php 中定义变量
     $nameOne = '周继平'; 
     $nameTwo = 'Zhou Jiping';
@@ -351,23 +400,21 @@ http://localhost:8888/?name=<a%20href="http://blog.zhoujiping.com">周继平的�
     </header>
 ```
 
-这么写没有问题，程序可以跑通，但是不方便管理，检索和数据处理了，所以这时候我们需要数组来帮助我们，在现代 php 中，数组使用一对中括号 `[]` 来定义, 如：
-```php
-    $names = []; // 定义一个变量名为 $names 的空数组
-```
-如此，`index.php` 中的用三个变量来存储名字的代码就可以使用数组来做：
+这么写对于 PHP 解释器来说没有任何问题，但是对于人类来说，就很有问题，首先是代码啰嗦重复，可读性差，其次是不好扩展，不好维护。针对这种情况，PHP 的数组可以帮助我们解决，php 数组使用 `array()` 来定义，而从 php5.4 开始，数组可以使用一对中括号 `[]` 来定义, 所以现在写代码千万不要再用`array()`去定义数组了，可读性和代码的整洁度太差了。
+
+我们将 `index.php` 中的三个变量换成数组来做，如下：
 
 ```php
-    $names = [
-        '周继平', 
-        'Zhou Jiping',
-        'Kuker Chou'
-    ];
+
+    $names = ['周继平', 'Zhou Jiping', 'Kuker Chou'];
 ```
 
-`$names` 就是一个索引数组，索引数组的每个元素都有个下标，从`0`开始，如通过 `$names[0]` 即可获得第一个元素的值，如果要遍历数组的值， 可以使用 `foreach` 语句， `foreach` 会从数组的第一个元素开始遍历至最后一个元素。`index.view.php` 中改写如下：
+`$names` 就是一个索引数组，索引数组的每个元素都有个下标，从`0`开始，如通过 `$names[0]` 即可获得数组中第一个元素的值，如果要遍历数组的值， 可以使用 `foreach` 语句， `foreach` 会从数组的第一个元素开始遍历至最后一个元素。
+
+我们将`index.view.php` 中改写如下：
 
 ```php
+
     <header>
         <ul>
             <?php
@@ -378,56 +425,55 @@ http://localhost:8888/?name=<a%20href="http://blog.zhoujiping.com">周继平的�
         </ul>
     </header>
 ```
+这样就能够正确的打印出三个名字了。
 
-这样改写程序还是能够跑通， 不过像 `index.view.php` 中我们使用 `{ }` 会让代码看起来比较的凌乱，尤其是当双引号中的 html 标签变多的时候，这时候对于 `echo` 和控制结构（类式 `foreach`, `if`, `while`）的语句我们可以使用替代语法，`echo` 的替代语法我们已经用过了，如下：
+> 像`[1，2，3]` 这样的数组我们叫做一维数组, 而像`[[1,2,3], [4,5,6]]`这样的我们叫做二维数组，一般使用到三维数组算是极限了，再多，开发者就会蒙了。
+
+## 使用替代语法
+
+为了让嵌套在 html 代码中的php代码更清晰易读，PHP 提供了一些流程控制的替代语法，包括 if，while，for，foreach 和 switch。替代语法的基本形式是把左花括号（{）换成冒号（:），把右花括号（}）分别换成 endif;，endwhile;，endfor;，endforeach; 以及 endswitch;。官方文档地址： http://php.net/manual/zh/control-structures.alternative-syntax.php
+
+我们将 `index.view.php` 中的 `foreach` 使用替代语法来书写:
 
 ```php
-<?php echo $variable; ?>
-// 可替代为
-<?= $variable; ?>
-```
-而像上面的 `foreach` 语句可以这样替代
 
-```php
     <header>
         <ul>
-            <!-- 开始的 { 用 : 替代 -->
             <?php foreach ($names as $name) : ?> 
                  <li>Hello, <?= $name ?></li>
             <?php endforeach; ?>
-            <!-- 结束的 } 用 endforeach 替代; -->
         </ul>
     </header>
 ```
-
-如果你曾经用过一些模版引擎，是不是发现这样的书写已经有点它们的影子存在了。
-
-> 关于更多的替代语法，请查阅这里 http://codeigniter.org.cn/user_guide/general/alternative_php.html
 
 ## 关联数组
 
 上面我们说到索引数组，它可以包含一系列的元素，如果出现这样一个情况，我们将一个人的名字，年龄，肤色保存在一个数组中，如果使用索引数组，那么是这样的：
 
 ```php
-$person = [
-    '周继平',
-    3,
-    '狗屎色'
-];
+
+    $person = [
+        '周继平',
+        3,
+        '狗屎色'
+    ];
 ```
+
 虽然用数组保存了这些元素，但是我们不知道这些元素究竟代表什么，如果我们可以将每个元素都设置一个 `key` , 那就会清楚很多，如下：
 
 ```php
-$person = [
-    'name' => '周继平',
-    'age'  => 3,
-    'skin_color' => '狗屎色'
-];
+
+    $person = [
+        'name' => '周继平',
+        'age'  => 3,
+        'skin_color' => '狗屎色'
+    ];
 ```
 
 想上面这样的数组就是关联数组，通过 `key => value` 的形式来定义一个元素, 如果想获取具体的元素的值，可以像 `$person['name']` 这样来获得，也可以通过 `foreach($array as $value)` 或是 `foreach($array as $key => $value)` 语句循环的操作它们, 请将 `index.php` 中的数组改成上面的关联数组，然后在 `index.view.php` 中我们这样输出：
 
 ```php
+
     <header>
         <ul>
             <?php foreach ($person as $key => $value) : ?>
@@ -439,28 +485,29 @@ $person = [
 
 ## 简单的调试
 
-我们可以用 `echo` 输出字符串，但是不能输出一个数组的所有值，可以使用 `print`, 或者使用 `var_dump()` 函数，
-我们经常会使用 `var_dump()` 来查看一个变量中具体有哪些值及其类型，如我们可以在 `index.php` 中 `$person` 数组下加上 `var_dump($person)` 这句代码来查看 `$person` 的值, 但是会发现`index.view.php`中的内容也输出了，这时候我们可以在其下在加上一句 `die()` 函数，让程序执行到这里结束，通过这两个函数就可以进行断点调试了
+在开发的时候， 我们经常会需要查看下某个变量或者是某个函数返回值的具体结果是什么，我们可以使用 `var_dump()` 来查看一个变量中具体有哪些值及值的类型是什么，如我们可以在 `index.php` 中 `$person` 数组下加上 `var_dump($person)` 这句代码来查看 `$person` 的值, 但是会发现`index.view.php`中的内容也输出了，这时候我们还可以在其下在加上一句 `die()` 函数，意思是让程序执行到这里结束，通过这两个函数就可以进行断点调试了
 ，如下：
-```php
-var_dump($person);
-die();
 
-// 或者这么写
-die(var_dump($person));
+```php
+
+    var_dump($person);
+    die;
+
+    // 或者这么写
+    die(var_dump($person));
 ```
 
 ## 布尔值和条件判断语句
 
-在任何时候，人类都需要做出选择，写程序也一样，在 PHP 中有一种值的类型叫做布尔型`（Bollean）`, 它只有两个值 `true` 和 `false`, 它通常和判断语句 `if--else`一起使用。翻译成中文就是，如果为 true或false 我做什么事，否则我做别的事，自己体会下就会明白，判断语句的语法结构如下:
+在任何时候，人类都需要做出选择，写程序也一样，在 PHP 中有一种值的类型叫做布尔型`（Boolean）`, 它只有两个值 `true` 和 `false`, 它通常和条件判断语句 `if--else` 一起使用。如下：
 
 ```php
 if (true or false) {
-    // 
+    // do something
 } elseif ( true or false) {
-    //
+    // do something
 } else {
-   //
+   // do something
 }
 ```
 
@@ -469,17 +516,18 @@ if (true or false) {
 我们之前接触的`var_dump()` 这种就是函数，函数的定义如下：
 
 ```php
-    function name($argment1, $argment2, ...) 
+    function name($argment1, $argment2 ...)  // 省略号代表还能有很多参数
     {
         // code
     }
 ```
-`function` 是 php 的一个关键字，代表你想定义一个函数， `name` 是你自己定义的一个名字，命名规则也是用小驼峰法，`$argment1, $argment2` 这些是函数的参数，其实就是变量，当你调用函数的时候，写上对应的值即可。
+`function` 是 php 的一个关键字，代表你想定义一个函数， `name` 是你自己给这个函数定义的一个名字，命名规则也是用小驼峰法，`$argment1, $argment2` 这些是函数的参数，其实就是变量，当你调用函数的时候，将值对应到每一个参数上就可以了。
 
 我们将刚才用于断点测试的代码写成一个函数，然后调用它，你就会明白怎么定义和调用函数了，首先要在与 `index.php` 同级目录下建立一个 `functions.php` 的文件，专门用来存放我们写的函数, 然后写上我们的断点调试函数，我们取名为 `dd`, `dumper and die` 的意思。
 
 ```php
-<?php
+
+    <?php
 
     function dd($data)
     {
@@ -487,35 +535,37 @@ if (true or false) {
         die(var_dump($data));
         echo '</pre>';
     }
-
 ```
-我们在 `index.php` 中引入 `functions.php`, 并调用 `dd()` 函数
+
+我们在 `index.php` 中引入 `functions.php`, 并调用 `dd()` 函数, 如下：
 
 ```php
-<?php 
 
-require 'functions.php';
+    require 'functions.php';
 
-$person = [
-    'name' => '周继平',
-    'age'  => 3,
-    'skin_color' => '狗屎色'
-];
+    $person = [
+        'name' => '周继平',
+        'age'  => 3,
+        'skin_color' => '狗屎色'
+    ];
 
-dd($person);
-
-require 'index.view.php';
+    dd($person);
 ```
 
-上面是 PHP 最基础的部分，每一部分都是点到而已，因为每一个点如果要深入都能挖掘出很多的东西，但是初期来说，上面这点知识够了，你在学习的是一门计算机的语言，和学英语是一样的道理，重要的在于实践，往往很多时候我们无法动手做的原因在于对整个流程不清楚，你知道了一些基础和流程，就可以通过 google, github, stackoverflow, 还有 php 的官方文档来开启和深入你的 php 生涯了，实践很重要，尤其是语言，像我读大学的时候英语一直很差，后来自己开办了个老外学普通话的机构，说的多了，写的多了，自然而然的英文水平就提高了些。
+上面是 PHP 最基础的部分，每一部分都是点到而已，因为每一个点如果要深入都能挖掘出很多的东西，但是初期来说，上面这点知识够了，你在学习的是一门计算机的语言，和学英语是一样的道理，重要的在于实践，往往很多时候我们无法动手做的原因是在于对整个开发流程不清楚，你知道了一些基础和流程后，就可以通过 Google, Github, Stack Overflow, 还有 php 的官方文档来开启和深入你的 php 生涯了，实践很重要，尤其是语言，像我读大学的时候英语一直很差，后来自己开办了个老外学普通话的机构，说的多了，写的多了，自然而然的英文水平就提高了些。
 
-当然，当你已经开发了几个项目后，你就得回头来系统的补下基础了，这个基础包括计算机系统原理，算法和数据结构，C语言等。
+当然，当你已经开发了几个项目后，你就得回头来系统的补下基础了，这个基础包括计算机系统原理，编译原理，算法和数据结构，C语言等。
 
-有了上面的基础了，下面我们开始接触下mysql, php 的面向对象，然后开始谈下框架的演变过程。
+有了上面的基础了，下面我们开始接触下 Mysql Database 和 php 的面向对象，然后开始谈下框架的演变过程。
 
 ## 接触 Mysql
 
-一个 Web 站点上会有很多的数据，我们可以把这些数据放在文件中，像我博客的这些文章，但是如果数据会经常需要增删改查，那就需要一个关系型的数据库来保存它们。我们经常使用的数据库管理系统有 `SQLite, Mysql, NOSQL, MongoDB`， 可以根据自己的需要来选择，不过 `Mysql` 和 `PHP` 基本已经成了黄金搭档了，比如说我们要开发一个 “待办事项列表”给自己使用，我们需要把这些 ”待办事项“ 存放在数据库中，我们用 `Mysql` 来做一下：
+一个 Web 站点上会有很多的数据，我们可以把这些数据放在文件中进行储存，比如像我这个新博客中的文章，就是存储在文件中的。 但是如果一个 Web 站点的数据会经常需要增删改查，那就需要一个数据库来保存它们了。我们经常使用的数据库管理系统有 `SQLite, Mysql, NOSQL, MongoDB` 等， 可以根据自己的需要来选择其中一个或几个搭配使用，不过 `Mysql` 和 `PHP` 基本已经成了黄金搭档了。
+
+
+# 二次修订到这里。。。。。下面未修订
+
+比如说我们要开发一个 “待办事项列表”给自己使用，我们需要把这些 ”待办事项“ 存放在数据库中，我们用 `Mysql` 来做一下：
 
 ### Mac 上用 Brew 安装 Mysql
 首先需要安装Mysql, 在 `Mac` 上可以通过 `brew` 来安装 `Mysql`， 具体的看我这篇文章中的安装 Mysql 的部分
@@ -1799,12 +1849,376 @@ require Router::load('routes.php')
         }
     }
 ```
+实际项目中还会使用到 `put/patch`, `delete` 的请求方式，可以用到的时候再加上这样的方法。
 
 
+## 使用 PDO 动态插入数据到数据库
+
+现在我们可以正常的获取 `post` 请求过来的数据，我们把`form`表单传递过来的`name`存储到数据库中，先在数据库中创建`users`表,
+里面有一个类型为`string` 的 `name`字段。
+
+我们先将`bootstrap.php` 中的`QueryBuilder`对象储存到`$app['database']`中， 其他对应的地方自己修改下。
+
+```php
+// bootstrap.php
+
+$app['database'] = new QueryBuilder(
+    Connection::make($app['config']['database'])
+);
+```
+
+假设我们的`QueryBuilder`对象已经拥有一个`insert`的方法， 那么在`add-name.php`中就可以这样调用.
+
+```php
+    // insert($table, $parameters)
+    $app['database']->insert('users', [
+        'name' => $_POST['name']
+    ]);
+```
+
+现在去`QueryBuilder.php`中实现这个方法.
+
+```php
+    // QueryBuilder.php
+    public function insert($table, $paramters)
+    {
+        // insert to users (name, age) values ('zhoujiping', 3);
+    }
+```
+
+向数据库中插入数据的 `sql` 语言为 `insert into 表名 (表字段1, 表字段2 ...) values ('对应的值', '对应的值')`, 这里的表名，表字段和值都是动态的，是由我们传递进来的，相当于上面的 `sql` 语句的模版是这样的 `insert into %s (%s) values (%s)`。 我们可以通过字符串链接符 `.` 来拼装我们需要的 sql 语句， 不过在 php 中还有一个更好的函数叫做 `sprintf()` 可以帮我们做到这点，比如说:
+
+```php
+    public function insert($table, $parameters)
+    {
+       $sql  = sprintf(
+        'insert into %s (%s) values (%s)',
+        'one', 'two', 'three'
+        );
+
+       var_dump($sql); die;
+    }
+```
+
+打印上面的 `$sql` 变量， 结果是 `string(36) "insert into one (two) values (three)"`, 看下结果就会知道`sprintf()`的用法了， 现在我们就来替换掉`one`, `two`, `three` 这三个值了， 首先`one`对应的是数据表名，就是我们参数中的`$table`。
+
+`two`是数据表的字段名，也就是我们 `$parameters` 的 key, 通过 `array_keys($parameters)` 可以获取由 $parameters 健值组成的一维数组,类似于`[name, age, email]`这样的，而我们这里需要的是 string 类型的, 类似这样的`(name, age, email)`， 如何将数组转成需要的字符串呢？ 如果不知道这样的php函数， 可以通过 google ` php array to string` 这样的关键词去搜索，我们会发现 `implode()` 函数可以解决这个问题 `implode(', ', $parameters)`。
+
+接着是`three` 字段对应的值，使用 PDO 插入数据都会需要经过一些 sql 语句的预处理，这里可以先用类式 `(:name, :age, :email)`这样的占位符， 然后执行的时候替换掉占位符即可。这样就能正确的插入数据到数据库了，完整的代码如下：
+
+```php
+
+    public function insert($table, $parameters)
+    {
+       $sql  = sprintf(
+            'insert into %s (%s) values (%s)',
+            $table,
+            implode(', ', array_keys($parameters)), 
+            ':' . implode(', :',array_keys($parameters)) //  这句不喜欢可以用array_map处理下
+        );
+
+       try {
+            $statement = $this->pdo->prepare($sql);
+            $statement->execute($parameters); // 执行时替换 :name ['name' => '周继平'] 
+       } catch (PDOException $e) {
+           die($e->getMessage());
+           // 如果是正式环境
+           // die('Something went wrong.');
+        }
+    }
+
+```
+现在可以插入值到数据库了，不过页面上没有显示，先到数据库看下就行了，也可以在`add-name.php` 添加 `header('Location: /')` 让其暂时跳往首页。然后在`controllers/.index.php` 中使用`$app['database']->selectAll('users')`, 获取 users 数据， 在`index.view.php` 中显示它们，如下：
+
+```php
+    <?php foreach ($users as $user): ?>
+        <li><?= $user->name; ?></li>
+    <?php endforeach ?>
+```
+
+## 添加 composer 依赖包管理
+
+现在看我们的`bootstrap.php`中有一堆的`require` 语句，这么操作显然很麻烦，现在有一个 php 的包依赖管理工具很流行，叫做 composer 官方地址为： https://getcomposer.org/ 先按照提示进行全局安装。先将 `bootstrap.php`中的下面4句代码注销
+
+```php
+    // require 'core/Router.php';
+    // require 'core/Request.php';
+    // require 'core/database/Connection.php';
+    // require 'core/database/QueryBuilder.php';
+```
+
+然后在根目录下建立 `coomposer.json` 的文件,输入以下内容:
+
+```json
+    {
+        "autoload": {
+            "classmap": [
+                "./"
+            ]
+        }
+    }
+```
+
+上面的意思是将根目录下的所有文件都让其自动包含进来， 我们在命令行执行 `composer install`, 然后只需要在`index.php`添加`require 'vendor/autoload.php';` 即可。我们可以看见我们想要包含的文件都已经在`vendor/composer/autoload_classmap.php`文件中生成了对应关系。
+
+## 实现第一个 依赖注入容器 DI Container 的雏形
+
+什么是 依赖注入容器 DI Container? 一个听上去非常高大上的东西，先不要去纠结字面的意思，你可以这么想，把我们的 APP 想象成一个很大的盒子，把我们所写的一些功能，比如说配置，数据库操作的`QueryBuilder`都扔到这个盒子里，但是扔进去的时候你要给它们贴一个标签，以后可以通过这个标签把它们取出来用。大体就是这个意思。
 
 
+我们来看`bootstrap.php` 中的代码， 其实 `$app` 这个数组就是一个容器，我们把配置文件扔到数组中，贴上`config`的标签，把`QueryBuilder`也扔进去了，贴上标签`database`。之后我们可以通过`$app['config']`这样拿出我们要的东东。
+
+```php
+
+    $app = [];
+
+    $app['config'] = require 'config.php';
+
+    $app['database'] = new QueryBuilder(
+        Connection::make($app['config']['database'])
+    );
+```
+
+我们为何不把`$app`数组做成一个对象呢！ 这样我们以后可以为其添加很多的属性和方法，会方便很多，需要对象就必须要有类，我们马上就可以在`core`文件夹内建立一个 `App.php` 的文件，当中包含`App`类。下面看看我们需要哪些方法，先看 `$app['config'] = require 'config.php';` 这一句是把`config.php`放进到`App`的容器中，现在常用的说法是 注册`config` 到`App`, 或者是绑定`config` 到`App`, 那我们需要的方法可能是这样的。
+
+```php
+
+    $app->bind('config', require 'config.php');
+    // 或者
+    $app->register('config', require 'config.php');
+    // 或者
+    App::bind(config', require 'config.php');
+    // 或者
+    App::register('config', require 'config.php');
+```
+
+在我们写类的时候，可能不知道怎么动手，可以先尝试着调用假定存在的方法，再回头去完善类，相对会容易些，上面的几种方法个人感觉`App::bind(config', require 'config.php');`更好些，然后要取出`config`可以使用 `App::get('config')` 方法，下面去实现这两个方法。在`core/App.php` 中
+
+```php
+<?php 
+
+     class App
+     {
+        protected static $registries = [];
+
+        public static function bind($key, $value)
+        {
+            static::$registries[$key] = $value;
+        }
+
+        public static function get($key)
+        {
+            if (! array_key_exists($key, static::$registries)) {
+                throw new Exception("No {$key} is bound in the container.");
+            }
+
+            return static::$registries[$key];
+        }
+     }
+ ```
+
+将之前使用到`$app['config']`和`$app['database']`的地方全部用`App::get('config')`和`App::get('database')`替换过来，然后我们测试一下，毫无疑问的会提示“找不到APP的错误”，原因是在我们的`autoload_classmap.php`文件中并没有导入`App.php`文件，我们需要在命令行执行 `composer dump-autoload` 来重新生成`autoload_classmap.php`文件。
 
 
+## 重构控制器为控制器类
+
+现在我们的控制器中的代码还都是一些面条式的代码,现在我们将做出我们的控制器类，然后让路由指向到对应的控制器的方法，这样在我们以后的工作流中就会方便很多。
+
+我们在`controllers`文件夹下建立 `PagesController.php` 的文件, 编写以下的代码
+
+```php
+<?php 
+
+    class PagesController
+    {
+        public function home()
+        {
+            $users = App::get('database')->selectAll('users');
+
+            require 'views/index.view.php';    
+        }
+
+        public function about()
+        {
+            require 'views/about.view.php';
+        }
+
+        public function contact()
+        {
+            require 'views/contact.view.php';
+        }
+    }
+```
+
+现在可以将`controllers`文件夹下的`index.php`, `about.php`, `contact.php`都删除了，现在我们访问首页肯定是出错的，因为我们的路由文件还没有改过来。我们可以将路由改成类式`laravel`框架的模样
+
+```php
+<?php
+
+    $router->get('', 'controllers/PagesController@home');
+    $router->get('about', 'controllers/PagesController@about');
+    $router->get('contact', 'controllers/PagesController@contact');
+```
+
+我们现在使用 `composer` 的自动加载文件，路经换成下面这样也是能够找到对应的文件的。
+
+```php
+
+    $router->get('', 'PagesController@home');
+    $router->get('about', 'PagesController@about');
+    $router->get('contact', 'PagesController@contact');
+```
+
+比方说上面的`about`的路由，意思是当访问`about`,就调用`PagesController`类的`about`方法, 所以我们要修改`Router.php`中的`direct()`方法。目前我们通过`$this->routes[$requestType][$uri]` 返回的是类式`PagesController@home`这样的 uri， 现在事实上我们希望的是这样的代码 `(new PagesController)->home();` 我们先假定有这样的方法叫做 `callAction()`,改下下现在的`direct()`方法.
+
+```php
+
+    public function direct($uri, $requestType)
+    {
+        if (array_key_exists($uri, $this->routes[$requestType])) {
+            return $this->callAction();
+        }
+
+        throw new Exception('No route defined for this URI');
+    }
+```
+
+我们来建立 `callAction()` 方法, 大体是这样的：
+
+```php
+
+    public function callAction($controller, $action)
+    {
+        $controllerObj = new $controller;
+
+        if (! method_exists($controllerObj, $action)) {
+            throw new Exception(
+                "{$controller} does not respond to the {$action} action."
+            );
+        }
+
+        return $controllerObj->$action();
+    }
+```
+
+上面的代码很简单，不用讲解，现在的问题是`direct()` 中调用`callAction()`的参数我们该如何获取，现在已经知道`$this->routes[$requestType][$uri]`的值是类式于 `PagesController@home` 这样的字符串，我们可以用`$this->routes[$requestType][$uri]` 将其拆分为 `['PagesController', 'home']` 这样的数组，然后使用 php5.6 之后出现的 `...`运算符，将其作为参数传递，我们具体来看下`explode()` 函数。
+
+打开终端，输入 `php --interactive` 进入命令行交互模式
+
+```bash
+$ php --interactive
+
+php > $values = explode('@', 'PagesController@home');
+php > var_dump($values);
+array(2) {
+  [0]=>
+  string(15) "PagesController"
+  [1]=>
+  string(4) "home"
+}
+
+```
+
+现在看下`direct()` 方法:
+
+```php
+
+    public function direct($uri, $requestType)
+    {
+        if (array_key_exists($uri, $this->routes[$requestType])) {
+            return $this->callAction(
+                ...explode('@', $this->routes[$requestType][$uri])
+            );
+        }
+
+        throw new Exception('No route defined for this URI');
+    }
+```
+
+下面更改下 `PagesController` 的 `require 'views/about.view.php';` 这句代码，我们改成 `return view('about');` 这样，可读性会好很多。在`bootstrap.php` 上加上我们的这个`view()` 全局函数
+
+```php
+
+    function view($name)
+    {
+        $name = trim($name, '/');
+        
+        return require "views/{$name}.view.php";
+    }
+```
+
+在看`PagesController`的`home` 方法当中有`$users`对象集合， 我们怎么传递它到`view`中呢？ 假设可以这样：
+
+```php
+    return view('index', ['users' => $users]);
+```
+
+更改全局函数`view()` 如下：
+
+```php
+
+    function view($name, $data =[])
+    {
+        extract($data);
+
+        return require "views/{$path}.view.php";
+    }
+```
+
+关于 `extract($data)`, 它可以将数组中将变量导入到当前的符号表， 看下输出就明白了，我们在命令行测试下：
+
+```php
+php > $data = ['user' => 'zhoujiping'];
+php > extract($data);
+php > echo $user;
+zhoujiping
+```
+
+我们在`routes.php` 再创建这样一条路由:
+
+```php
+    $router->get('users', 'UsersController@index');
+    $router->post('users', 'UsersController@store');
+```
+
+建立 `UsersController` 控制器
+
+```php
+
+<?php 
+
+    class UsersController
+    {
+        public function index()
+        {
+            $users = App::get('database')->selectAll('users');
+
+            return view('users', compact('users'));
+        }
+
+        public function store()
+        {
+            App::get('database')->insert('users', [
+                'name' => $_POST['name']
+            ]);
+
+            return redirect('users');
+        }
+    }
+```
+
+视图层自己建立下， 看上面的`redirect()`全局函数， 如下
+
+```php
+    function redirect($path)
+    {
+        header("Location: /{$path}");
+    }
+```
+
+## 命名空间
+
+命名空间，把它想象成文件夹就可以了， 我们现在所有的类都在同一个命名空间下， 我们可以为类加上自己的命名空间
 
 
 

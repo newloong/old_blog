@@ -1,11 +1,12 @@
 ---
 title: 论PHP框架是如何诞生的?
 date: 2017-05-23
-updated: 2017-06-01
+updated: 2017-06-04
 categories:
  - php
 ---
-> 提前说明： 本博客不支持响应式，不支持 IE, 请使用标准浏览器打开。
+
+> 本文已经过二次修订，源码地址： https://github.com/zhoujiping/build-your-own-php-framework
 
 你好，我是“老周”，这是新博客的开篇文章，也是“PHP 相关知识技能整理系列” 的第一章，这一章的内容主要是先使用原生的PHP开发出一些简单的页面， 然后将这些页面一步一步的，经过多次重构，最终演变成一个简单的PHP MVC 框架，我们会借鉴 `Laravel` 框架的用法及其思想来慢慢完成我们自己的这个小框架。为什么要借用 `Laravel` 框架的思想，这里就不去做推销了，单凭它是全世界 PHP 开发人员使用最多的一款框架，就值得我们去研究和借鉴了。
 
@@ -502,13 +503,14 @@ htmlspecialchars() 函数， 官方文档的解释是将特殊字符转换为 HT
 在任何时候，人类都需要做出选择，写程序也一样，在 PHP 中有一种值的类型叫做布尔型`（Boolean）`, 它只有两个值 `true` 和 `false`, 它通常和条件判断语句 `if--else` 一起使用。如下：
 
 ```php
-if (true or false) {
-    // do something
-} elseif ( true or false) {
-    // do something
-} else {
-   // do something
-}
+
+    if (true or false) {
+        // do something
+    } elseif ( true or false) {
+        // do something
+    } else {
+       // do something
+    }
 ```
 
 ## 函数
@@ -516,11 +518,13 @@ if (true or false) {
 我们之前接触的`var_dump()` 这种就是函数，函数的定义如下：
 
 ```php
+
     function name($argment1, $argment2 ...)  // 省略号代表还能有很多参数
     {
         // code
     }
 ```
+
 `function` 是 php 的一个关键字，代表你想定义一个函数， `name` 是你自己给这个函数定义的一个名字，命名规则也是用小驼峰法，`$argment1, $argment2` 这些是函数的参数，其实就是变量，当你调用函数的时候，将值对应到每一个参数上就可以了。
 
 我们将刚才用于断点测试的代码写成一个函数，然后调用它，你就会明白怎么定义和调用函数了，首先要在与 `index.php` 同级目录下建立一个 `functions.php` 的文件，专门用来存放我们写的函数, 然后写上我们的断点调试函数，我们取名为 `dd`, `dumper and die` 的意思。
@@ -558,26 +562,23 @@ if (true or false) {
 
 有了上面的基础了，下面我们开始接触下 Mysql Database 和 php 的面向对象，然后开始谈下框架的演变过程。
 
-## 接触 Mysql
+## 安装 Mysql
 
 一个 Web 站点上会有很多的数据，我们可以把这些数据放在文件中进行储存，比如像我这个新博客中的文章，就是存储在文件中的。 但是如果一个 Web 站点的数据会经常需要增删改查，那就需要一个数据库来保存它们了。我们经常使用的数据库管理系统有 `SQLite, Mysql, NOSQL, MongoDB` 等， 可以根据自己的需要来选择其中一个或几个搭配使用，不过 `Mysql` 和 `PHP` 基本已经成了黄金搭档了。
 
-
-# 二次修订到这里。。。。。下面未修订
-
-比如说我们要开发一个 “待办事项列表”给自己使用，我们需要把这些 ”待办事项“ 存放在数据库中，我们用 `Mysql` 来做一下：
-
-### Mac 上用 Brew 安装 Mysql
-首先需要安装Mysql, 在 `Mac` 上可以通过 `brew` 来安装 `Mysql`， 具体的看我这篇文章中的安装 Mysql 的部分
+如果已经安装了集成开发环境的话，那你就可以直接使用数据库了，你也可以单独安装它，在 Windows 下可以下载安装包直接安装， 在 Mac Os 系统上，我们可以通过 `Homebrew` 来安装 `Mysql`， 具体的安装方法可以看我下面这篇文章中的安装 Mysql 的部分
 
 > [全新安装Mac OS Sierra (10.12)并使用HomeBrew安装ZSH + MNMP (Mac + Nginx + Mysql + Php) 开发环境](http://blog.zhoujiping.com/notes/mnmp.html)
 
-### 登录 Mysql 数据库
-开启`mysql`服务后，在终端通过`mysql -u 用户名 -p 密码` 就可以登录到`mysql`中
+## 登录 Mysql 数据库
+
+开启`mysql`服务后，（如何开启，可以 Google）, 在终端通过`mysql -u 用户名 -p 密码` 就可以登录到`mysql`中, 如下:
 
 ```bash
+
     $ mysql -u root -p           
     Enter password: 
+
     Welcome to the MySQL monitor.  Commands end with ; or \g.
     Your MySQL connection id is 4
     Server version: 5.7.17 Homebrew
@@ -593,398 +594,384 @@ if (true or false) {
     mysql> 
 ```
 
-### 查看 Mysql 内所有数据库
+## 常用的一些 Mysql 命令
+
+### 查看 Mysql 内所有数据库 `show databases;`
 
 进入 `Mysql` 数据库中， 可以通过 `Sql` 语言来操作了，先通过 `show databases;`看一下我们目前有哪些数据库存在:
 
 ```bash
-mysql> show databases;
 
-+--------------------+
-| Database           |
-+--------------------+
-| information_schema |
-| mysql              |
-| performance_schema |
-| sys                |
-| zjpblog            |
-+--------------------+
+    mysql> show databases;
+
+    +--------------------+
+    | Database           |
+    +--------------------+
+    | information_schema |
+    | mysql              |
+    | performance_schema |
+    | sys                |
+    | zjpblog            |
+    +--------------------+
 ```
 
-### 创建一个新的数据库 mytodo
+### 创建一个新的数据库 `create database 数据库名`
 
-下面来创建一个数据库存放我们的“待办事项”，取名为 `mytodo`, 通过 `create database mytodo;` 来创建
+我们可以使用 `create database 数据库名` 来创建一个数据库， 如我们现在创建一个 `test` 的数据库, 如下：
 
 ```bash
-# 下面的 mysql> 代表目前你处于 mysql 的环境中
-# create database mytodo;  是sql语句，不是命令，不要忘记了分号
-mysql> create database mytodo; 
+
+    # 下面的 mysql> 代表目前你处于 mysql 的环境中
+    # create database test;  是sql语句，不是命令，不要忘记了分号
+    mysql> create database test; 
 ```
 
-### 切换当前数据库
+### 切换当前数据库 `use 数据库名`
 
-现在通过 `show databases;` 就能看见刚才创建的 `mytodo` 数据库了，当你要具体操作某一个数据库的时候，你得通过`use 数据库名` 切换到你要操作的数据库，`mysql`数据库管理系统内有这么多的数据库存在，你如果不指定用哪一个，那就乱套了。
+现在通过 `show databases;` 就能看见刚才创建的 `test` 数据库了，当你要具体操作某一个数据库的时候，你得通过`use 数据库名` 切换到你要操作的数据库，`Mysql` 数据库管理系统可以存放很多的数据库，你需要先指定使用哪个数据库，然后才可以对应进行操作。
 
 ```bash
-    mysql> use mytodo;
+
+    mysql> use test;
+
     Database changed
 ```
 
-### 查看所有数据表 table
+### 查看所有数据表 `show tables;`
 
-一个数据库会内有很多的数据表 `tables`, 通过`show tables;` 可以查看所有的数据表：
+一个数据库中会存在很多表，一个表中会存在很多字段，你可以把数据库想象成一个文件夹，把数据库表想象成 Excel 文件，把数据库的字段想象成 Excel  文件中的每一个列。一个文件夹中可以有很多的 Excel 文件， 一个 Excel 文件中也可以有很多的列， 同理，一个数据库中有很多的表，一个表中有很多的字段（字段就相当于列）。
 
-```bash
-mysql> show tables;
-Empty set (0.00 sec) # 目前我们还没有建立表，是空的
-```
-
-### 创建数据表
-
-你可以把数据库想象成一个文件夹，把数据库中的表想象成是 `excel` 文件，在每个`excel`文件内，你会给每个列取个名字，然后对应的填上你的数据，数据表也一样，只不过它的列叫做 “字段”,同时你在创建的时候需要指定每个“字段”内可以存放的值的类型，我们来创建一个 `todos` 的表。
+通过 `show tables;` 我们可以查看指定数据库的所有数据表：
 
 ```bash
-mysql> create table todos (id     integer  PRIMARY KEY AUTO_INCREMENT, description text     NOT NULL, completed boolean NOT NULL);
 
-#注解： create table todos (字段名   整形     主键         自增长         ,  字段名2      文本型    不为空); 
+    mysql> show tables;
+    Empty set (0.00 sec) # 目前我们还没有建立表，是空的
 ```
-字段 `id`, 有一个`PRIMARY KEY`的属性，代表它是主键，是唯一的，`AUTO_INCREMENT` 是自增长的意思，你插入数据到表中的时候，不用手动为`id`添加值，它是自动生成。
 
-### 查看数据表内所有字段的属性
+### 创建数据表 `create table 数据表名`
 
-通过 `describe 数据表名;` 可以查看这个表内每个字段的具体属性：
+我们刚才说了，数据表就相当于是 Excel 文件，那每个文件都会有个名称，并且每个 Excel 文件中会存在很多列, 我们的数据表把这个列叫做字段，我们可以通过 `create table 数据表名(字段1， 字段2 ...)` 来创建一个包含字段的数据表，我们先来看一条创建表的 Sql 语句, 比如我们创建一个 `users` 表， 这个 `users` 表有 `id`, `name`, `is_admin` 三个字段。
+
+按照上面我们给出的创建表的语句模版，我们可以写出像下面这样的 `Sql` 语句:
+
+```sql
+
+    create table users (id, name, is_admin);
+```
+
+上面这样的语句运行的时候是会出错的，原因是我们给数据库表创建字段的时候还需要指定它的类型，如 `id`, 应该是整形的，`name` 应该是字符串类型的， `is_admin` 应该是 Boolean 型的。 另外为了避免表中的数据重复，我们通常会将 `id` 设置为主健，并让它的数字能主动增长，而不用手动插入， 同时像 `name` 这种字段的值我们希望是必填的，所以会加上 `NOT NULL` 这样的附加条件， 所以我们的 Sql 语句太多是这样的：
+
+```Sql
+    
+    create table users ( 
+        id integer PRIMARY KEY AUTO_INCREMENT, 
+        name varchar(255) NOT NULL, 
+        is_admin boolean NOT NULL
+    );
+```
+
+更多关于字段的类型和属性，访问官网： https://dev.mysql.com/doc/refman/5.7/en/create-table.html 
+
+
+### 查看数据表字段属性 `describe 数据表名`
+
+通过 `describe 数据表名;` 可以查看这个表内每个字段的具体属性，比如我们看下刚才创建的`users`表各字段属性：
+
 ```bash
-mysql> describe todos;
-+-------------+------------+------+-----+---------+----------------+
-| Field       | Type       | Null | Key | Default | Extra          |
-+-------------+------------+------+-----+---------+----------------+
-| id          | int(11)    | NO   | PRI | NULL    | auto_increment |
-| description | text       | NO   |     | NULL    |                |
-| completed   | tinyint(1) | NO   |     | NULL    |                |
-+-------------+------------+------+-----+---------+----------------+
+
+    mysql> describe users;
+    +----------+--------------+------+-----+---------+----------------+
+    | Field    | Type         | Null | Key | Default | Extra          |
+    +----------+--------------+------+-----+---------+----------------+
+    | id       | int(11)      | NO   | PRI | NULL    | auto_increment |
+    | name     | varchar(255) | NO   |     | NULL    |                |
+    | is_admin | tinyint(1)   | NO   |     | NULL    |                |
+    +----------+--------------+------+-----+---------+----------------+
 ```
-### 插入数据到 todos 表中
+
+### 插入数据到表中 `insert into 数据表名 (字段 ...) values (值 ...)`
+
+现在我们已经有了数据表，而且也在数据表定义了三个字段，我们可以为每个字段添加数据了。通过`insert into 数据表名 (字段 ...) values (值 ...)` ，如下：
 
 ```bash
-mysql> insert into todos (description, completed) values('写博客', false);
+
+    insert into users (name, is_admin) values('周继平', true);
 ```
-### 查询表中的所有数据
+
+### 查询表中的所有数据 `select * from 表名`
 
 ```bash
-mysql> select * from todos;
-+----+-------------+-----------+
-| id | description | completed |
-+----+-------------+-----------+
-|  1 | 写博客      |         0 |
-+----+-------------+-----------+
-```
-> 更多关于 `sql` 语句，访问： https://www.w3schools.com/sql/default.asp ， 可以快速浏览一下，熟悉点关键字，用的时候再去google。
 
-###  用Mysql客户端管理工具来管理Mysql数据库
+    mysql> select * from users;
+    +----+-----------+----------+
+    | id | name      | is_admin |
+    +----+-----------+----------+
+    |  1 | 周继平    |        1 |
+    +----+-----------+----------+
+```
+
+> sql 也是一门语言， 需要花时间单独去学习，上面只是简单的例举了下，官方文档在： https://dev.mysql.com/doc/ 
+
+##  用Mysql客户端管理工具来管理Mysql数据库
 
 通常很少真有人一直在命令行去操作数据库，在 `Mac` 上可以使用 `Sequel pro` 来管理， 在 `Windows` 上可以用 `Navcat`
 
-> Sequel pro - http://www.sequelpro.com/  免费, 简单易用，本人一直用这个，只支持 `Mac` 系统
+> Sequel pro - http://www.sequelpro.com/  免费, 简单易用，只支持 `Mac` 系统
 > Querious - http://www.araelium.com/querious/ 只支持 `Mac` 系统，收费
 > Navcat - https://www.navicat.com.cn  收费，支持`Mac`, `Windows`, `Linux`
 
-## 接触 PHP 的类和对象
+## 开始开发一个 todoList 的 小项目
 
-现代的 PHP 开发都是基于面像对象的，可以将任何东西都看作对象，我们可以创建一个或者多个对象，有些对象会有一些相同的特征，所以我们会基于一个模版来创建这些对象，而这个模版我们可以称呼为“类”, 我们用关键词 "class" 即可以声明一个类，如声明一个“待办事项的类”
+Mysql 我们也安装完了， 简单的 Sql 语句也学了一些， 下面我们开始开发一个待办任务列表 todoList 的小项目。
 
-```php
-class Task 
-{
-    //
-}
-```
+## 编写 Task 类
 
-我们把 `index.php` 中的代码改成下面这样：
+现代的 PHP 开发都是基于面像对象的，我们可以将任何东西都看作对象，对象可以创建一个或多个，有些对象会有一些相同的特征，所以我们会基于一个模版来创建这些对象，而这个模版我们可以称呼为“类”, 我们用关键词 "class" 即可以声明一个类。
+
+现在我们要开发一个 代表任务列表 的项目， 首先我们会需要有任务这个对象 `$task`, 那就必须先有 `Task` 这个类, 我们在 `index.php` 中先定义这个类， 如下：
 
 ```php
-<?php 
 
-require 'functions.php';
+    <?php 
 
-class Task 
-{
-    protected $description;
-
-    protected $completed = false;
-
-    public function __construct($desc)
+    class Task 
     {
-        $this->description = $desc;
+        // 任务的描述
+        protected $description;
+
+        // 该任务是否完成
+        protected $completed = false;
+        
+        // 构造函数， 创建 Task 对象的时候会被调用
+        public function __construct($desc)
+        {
+            $this->description = $desc;
+        }
     }
-}
 
-$taskOne = new Task('写博客');
-$taskTwo = new Task('中午去幼儿园打小男孩');
+    $taskOne = new Task('写博客');
+    $taskTwo = new Task('中午去幼儿园打小男孩');
 
-dd([$taskOne, $taskTwo]);
-
-require 'index.view.php';
+    var_dump([$taskOne, $taskTwo]);
+    die;
 ```
 
-上面的 `Task` 就是一个类，我们可以通过 `new 类名` 来创建对象，像上面我们通过`new Task('xx')` 创建了两个任务。我们希望在创建任务对象的时候能将具体的任务内容也生成，PHP 给每个类都提供了一个构造方法 `__construct`,这个方法会在你创建一个对象的时候自动调用，php给我们提供的类式这样的方法我们叫做魔术方法，魔术方法都是以 `__` 开始的。
+上面的 `Task` 就是一个类，我们可以通过 `new 类名` 来创建对象，像上面我们通过`new Task('xx')` 创建了两个任务。我们希望在创建任务对象的时候能将具体的任务内容也生成，PHP 给每个类都提供了一个构造方法 `__construct`,这个方法会在你创建一个对象的时候自动调用，php 给我们提供的类式这样的方法我们叫做魔术方法，魔术方法都是以 `__` 开始的。
 
-我们再来看 `Task`, 在这个类中有 `$description, $completed ` 两个变量， 有`__construct` 这个函数，不过再类中，我们把像上面这样的变量叫做类的“属性”，把函数叫做类的“方法”。
+我们再来看 `Task`, 在这个类中有 `$description, $completed ` 两个变量， 有`__construct` 这个函数，不过在类中，我们把像上面这样的变量叫做类的“属性”，把函数叫做类的“方法”。
 
 在 `$description` 前面的 `protected` 这个关键词是用来限定访问权限的, 一共有三种权限：
 
-> private - 使用了改修饰的属性和方法只能在类的内部调用;
-> protected - 使用了改修饰的属性和方法只能该类和该类的子类中调用
-> public - 使用了改修饰的属性和方法只能在类的内外部或者子类中都可以调用
+> private - 使用了该修饰符的属性和方法只能在类的内部调用;
+> protected - 使用了该修饰符的属性和方法可以在该类和该类的子类中调用
+> public - 使用了该修饰符的属性和方法在类的内外部或者子类中都可以调用
 
-`$this->description = $desc;`  `$this` 代表当前对象，如果是`$taskOne`调用 description， `$this` 就代表`$taskOne` 这个对象， 如果是`$taskTwo`调用 description， `$this` 就代表`$taskTwo` 这个对象。这里的 `->` 符号就是对象调用属性和方法的操作符。
+看构造函数中的这句代码 `$this->description = $desc;`  `$this` 代表的是当前对象，如果是`$taskOne`对象调用了 `$description` 属性， 那这里的 `$this` 就代表`$taskOne` 这个对象， 如果是`$taskTwo`调用 `$description` 属性， 这里的 `$this` 就代表 `$taskTwo` 这个对象。这里的 `->` 符号是对象调用属性和方法的操作符。
 
-上面说到 `$compoleted` 是被 `protected` 修饰的，所以我们不能在类外部直接调用它，我们现在来编写一个方法：
+上面说到 `$compoleted` 是被 `protected` 修饰的，所以我们不能在类外部直接调用它，但是我们可以编写一个方法，在这个方法中返回 `completed` 这个属性, 如下:
 
 ```php
-public  function isComplete()
-{
-    return $this->completed;
-}
+
+    public  function isComplete()
+    {
+        return $this->completed;
+    }
 ```
 
-这样就可以通过 `$taskOne->isComplete()` 来获取`$completed`的值了，为什么不直接将`$compoleted`　的访问权限改成 public 呢？ 主要是为了安全性的考虑，最好不要预先就将属性设置成`public`, 这样任何对象就都能访问它或者去尝试修改它的值了，将属性设置成`private 或者 protected`, 然后通过一些方法来访问和修改属性，你可以在方法中编写一些处理或过滤的功能，这样就会好很多。基于这个想法，那么对象如果要修改`$completed`的值，那就需要下面的方法:
+这样就可以通过 `$taskOne->isComplete()` 来获取 `$taskOne` 对象的 `$completed`的值了。为什么不直接将`$compoleted`　的访问权限修改成 `public` 呢？ 这里主要是为了安全性的考虑，我们可以在`isComplete()` 方法添加一些判断条件，只将`$completed` 返回给符合条件的对象。这里就扩充代码了。
+
+在开发的时候，最好不要预先就将属性的访问修饰符设置成`public`, 先将属性设置成 `private`, 然后根据需要来修改访问权限。
+
+既然 `$completed` 属性是 `protected`(受保护的)，那么在类的外部我们也不能修改它的值， 要修改它的值，我们还得再编写一个方法，如下：
 
 ```php
+
     public function complete()
     {
         $this->completed = true;
     }
 ```
 
-> 上面的代码可到 https://github.com/zhoujiping/build-your-own-php-framework 查看第一次提交的代码
+## 创建 todolist 数据库
 
-## 通过 `PDO` 对象连接数据库
-
-### 创建 PDO 资源对象
-
-我们先在 `todos` 表中插入点数据
+现在我们去创建一个`todolist`的数据库，然后在当中创建一个`tasks`的表, 字段有自增长的主健`id`, 文本( text )类型的`description`, 和 boolean 类型的`completed` ， 自己创建一下，然后 `tasks` 表中随意插入点数据。
 
 ![task数据库数据](/images/php/step_1/4.jpg)
 
-然后创建 `PDO` 资源对象，创建对象很多时候也叫“实例化一个对象”。
+## 什么是 PDO 扩展？
+
+现在我们的数据库已经有了，我们如何通过 PHP 去连接数据库操作执行对应的操作呢？ 很久很久以前，我们会用`mysql_connect()`这样的函数， 但是这种函数存在很大的安全问题，具体安全问题回头再说。 现在 PHP 提供了一些更好的数据库扩张来操作数据库, 首先 PHP 提供了一些像 `DBA`, `ODBC`, `PDO`等数据库抽象层，我们使用`PDO`来连接我们的数据库。
+
+PHP 数据对象 （PDO） 扩展为PHP访问数据库定义了一个轻量级的一致接口。实现 PDO 接口的每个数据库驱动可以公开具体数据库的特性作为标准扩展功能。 利用 PDO 扩展自身并不能实现任何数据库功能；必须使用一个 具体数据库的 PDO 驱动 来访问数据库服务。PDO 提供了一个 数据访问 抽象层，这意味着，不管使用哪种数据库，都可以用相同的方法来查询和获取数据。
+
+## 创建 PDO 资源对象
+
+我们可以通过下面这句代码来创建一个 PDO 的资源对象
 
 ```php
-// mysql - 告诉pdo我用的是mysql数据库
-// host=127.0.0.1 地址，你的mysql装在哪个服务器上，IP或地址是多少，我们跑在本地，所以是127.0.0.1或localhost
-// dbname - 数据库名
-// username - 登录mysql的用户名
-// my_password - 登录mysql的密码
 
-$pdo = new PDO('mysql:host=127.0.0.1;dbname=mytodo', 'username', 'my_password');
+    $pdo = PDO('mysql:host=127.0.0.1;dbname=todolist', 'username', 'my_password');
 ```
-`PDO` 是 PHP 提供的一个用来连接和操作数据库的类，我们先创建一个`$pdo`资源对象，这里会存在一个问题，就是很有可能因为数据库软件没有运行，或者是用户名和密码输错而导致异常，这里我们需要通过`try`和`catch`来处理异常.
 
-### PDO连接不上数据库的异常处理
+> - mysql - 告诉pdo我要连接的是 mysql 数据库
+> - host=127.0.0.1 地址，你的mysql装在哪个服务器上，IP或地址是多少，我们跑在本地，所以是127.0.0.1或localhost
+> - dbname - 数据库名
+> - username - 登录mysql的用户名
+> - my_password - 登录mysql的密码
+
+这里我们通过 `new PDO()` 创建了 PDO 的资源对象， 并将该对象赋值给 `$pdo` 变量, 代码没有任何问题，但是可能会因为数据库软件没有运行，或者是用户名和密码输错而导致异常，从而导致不能正常的连接数据库，如果出错了，PDO 对象会自动抛出一个 `PDOException` 的异常，我们再写代码的时候最好是要将这个异常给捕获的，通过`try...catch`就可以来处理了，如下：
 
 ```php
-try {
-    $pdo = new PDO('mysql:host=127.0.0.1;dbname=mytodo', 'username', 'my_password');
-} catch (PDOException $e) {
-    die('Sorry, could not connect');
-}
+
+    try {
+        $pdo = new PDO('mysql:host=127.0.0.1;dbname=todolist', 'username', 'my_password');
+    } catch (PDOException $e) {
+        die('Sorry, could not connect');
+    }
 ```
-`try` 内的代码始终会运行一遍，如果出错了，会被抛出异常，该异常会被 `catch` 捕获住， 当捕获到异常，我们使用`die()`让程序停止运行。
 
-### 通过 pdo 获取数据表 todos 中的内容
+按照字面意思的翻译就是 我们试着通过 PDO 去连接数据库， 如果连接成功，那就继续执行代码，如果出现了异常，PDO 会自动抛出这个 PDOException 的异常，我们在 catch 中捕获它。可以自己尝试一下。
 
-将 `index.php` 改成：
+## 获取数据表 tasks 中的所有数据
+
+现在我们已经成功的通过 PDO 连接数据库，并创建了 PDO 的资源对象，下面可以通过`$pdo`对象去执行 sql 语句来操作数据库了，通常为了安全起见，都需要对 `sql` 语句进行预处理，然后执行它，如下：
 
 ```php
-<?php 
 
-try {
-    $pdo = new PDO('mysql:host=127.0.0.1;dbname=mytodo', 'username', 'your_password');
-} catch (PDOException $e) {
-    die('Sorry! Could not connect');
-}
+    // 预处理 sql 语句, 返回 PDOStatement 对象
+    $statement = $pdo->prepare('select * from tasks');
 
-$statement = $pdo->prepare('select * from todos');
+    // 执行预处理语句
+    $statement->execute();
 
-$result = $statement->fetchAll(PDO::FETCH_OBJ);
-
-var_dump($result);
+    // 通过 PDOStatement 对象的 fetchAll() 方法
+    $tasks = $statement->fetchAll(PDO::FETCH_OBJ);
 ```
 
-当我们正确的连接上数据库，会返回一个资源对象，接着需要预处理 `sql` 语句
+> PDO 官方文档 http://php.net/manual/zh/book.pdo.php 
 
-```php
-$statement = $pdo->prepare('select * from todos');
-```
-### sql 注入之类的安全问题
-使用 `prepare` 的好处是为了避免一些 `sql` 注入的安全问题，这里不展开说，简单的说下吧！正常开发的时候我们的`sql`语句的部分内容是由用户传递过来的，如：
+## 为什么使用 PDO 扩展？
+
+为什么要使用 PDO 扩展， 而不使用以前的 `mysql_connect()` 之类的函数呢？ 这里主要是为了防止`sql注入`的安全问题, 在正式项目中我们基本不会查询出一个表中的所有数据显示给用户，通过都会有一些限定条件，比如说，我们现在想要查询出已完成的任务或着是只查询出未完成的任务， sql 语句如下：
 
 ```sql
-select * from todos where completed = ?;
+
+    select * from tasks where completed = ?;
 ```
 
-比如这里是希望用户通过传`1` 或者 `0` 来获取完成或者未完成的任务列表，但是往往用户不会这么做，如果用户输入`1 or true`,如果不做处理，就会把所有的任务都读取出来了。所以当你看一些资料的时候要自己鉴别下，如果使用`mysql_connect()`函数去连接数据库，那是很不安全的，还好高版本已经不支持这个函数了，所以安装 `php` 版本的时候也最好安装最新的，比如现在一定要用 `php7` 了。
+`?` 这里的值是可变的，是由用户传递过来的，我们希望用户通过传`1` 或者 `0` 来获取完成或者未完成的任务列表，但是往往用户不会这么做，如果用户输入`1 or true`, 或者是 `0 or true`   如果不做处理，就会把所有的任务都读取出来了。而使用 PDO 扩展， 它有一个 sql 语句的预处理机制， 可以防止这些 sql 注入问题的发生。如果是像`mysql_connect()`函数就不具备这种功能了，不过所幸的是自 `php5.5` 开始已经废除了这个函数，所以说安装最新的 PHP 版本是非常用必要的。
 
-接着，我们可以执行预处理过的 sql 语句，然后获取所有的任务，但是我们可以通过传递 `PDO::FETCH_OBJ`参数来过滤输出内容，只要获取当中的对象.
+
+## Model层对象和数据库返回对象的对应
+
+我们打印出 `$tasks` 的结果，如下：
+
+![tasks的对象](/images/php/step_1/5.jpg)
+
+从上图我们可以看出 `$tasks` 数组中包含的是两个是两个php标准对象(stdClass)， 但是如果我们在获取对象的时候能得到两个`Task` 对象， 那就能将 `Task` 类和数据库中的 `tasks` 表给对应起来，再将`Task`类的属性和`tasks`表中的字段也一一对应起来，那就可以很方便的使用 `Task` 类来操作 `tasks` 数据表了。现在的`ORM`其实就是这个思想。如何做到，很简单，我们只需要给`$statement->fetchAll(PDO::FETCH_OBJ);` 改写一下即可：
 
 ```php
-$statement->execute();
 
-$results = $statement->fetchAll(PDO::FETCH_OBJ);
+    $tasks = $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
 ```
-现在使用 `var_dump($results)` 打印出 `$results` 的值
 
-![pdo获取数据库的值](/images/php/step_1/5.jpg)
-
-### 对象和关系的映射
-
-`$results` 是一个包含的是两个php标准对象(stdClass)的数组， 但是如果我们在获取对象的时候能得到两个`Task` 对象， 将对象和数据表的关系对应上，那之后开发就方便多了，我们来改写一下`$results = $statement->fetchAll(PDO::FETCH_OBJ);`
+将常量 `PDO::FETCH_OBJ` 换成 `PDO::FETCH_CLASS` 常量，并通过第二个参数`Task` 指定返回的对象是 `Task` 类的对象， 这里使用了 PHP 的反射机制，它会去寻找`Task`类，并创建其对象。我们现在还没有'Task'类，我们去根目录下新建一个`Task.php`的文件，在里面定义 `Task` 类， 如下：
 
 ```php
-$tasks = $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
-```
-通过设置 `PDO::FETCH_CLASS`参数，可以返回一个具体的对象，`Task` 指定返回的具体对象，它是类`Task`的对象，现在我们还没有'Task'类，我们去新建一个`Task.php`的文件
 
-```php
-<?php
+    <?php 
 
     class Task 
     {
-        public $description;
+        // 任务的描述
+        protected $description;
 
-        public $completed;
+        // 该任务是否完成
+        protected $completed;
         
+        // 获取 $completed 的值
+        public  function isComplete()
+        {
+            return $this->completed;
+        }
+
+        // 设置任务已完成 
+        public function complete()
+        {
+            $this->completed = true;
+        }
     }
 ```
-在 `index.php` 中 `require 'Task.php'`, 现在 `var_dump($tasks)`, 如下：
+
+index.php 中的代码如下：
+
+```php
+
+    <?php 
+
+    require 'Task.php';
+
+    try {
+        $pdo = new PDO('mysql:host=127.0.0.1;dbname=todolist', 'username', 'my_password');
+    } catch (PDOException $e) {
+        die('Sorry, could not connect');
+    }
+
+    // 预处理 sql 语句, 返回 PDOStatement 对象
+    $statement = $pdo->prepare('select * from tasks');
+
+    // 执行预处理语句
+    $statement->execute();
+
+    // 通过 PDOStatement 对象的 fetchAll() 方法
+    $tasks = $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
+```
+
+现在返回的 $tasks 数组中就都是 `Task` 类的对象了
 
 ![ORM](/images/php/step_1/6.jpg)
 
-现在我们在 `Task` 类中新声明的任何属性和方法，都能够被 `$tasks` 内的对象调用了，从而实现了对象和关系映射（ORM）的雏型。
+我们在 `Task` 类中声明的任何属性和方法，都能够被 `$tasks` 内的对象调用了。
 
-### 现在的文件和代码罗列
+## 第一次代码重构
 
-再看下现在已有的文件和代码：
+首先什么是代码重构？代码重构的意思是在不影响功能的前提下对现有代码的结构进行改变，对类，方法进行重命名，对代码、接口进行抽取，对字段进行重新封装等。
 
-`Task.php` 文件
+现在我们已经能够成功的连接到数据库，并拿到数据表中的数据，同时也做了类与表的简单映射，不过我们的代码很乱，我们来做一次简单的重构。
 
-```php
-<?php
-
-class Task 
-{
-    public $description;
-
-    public $completed;
-}
-```
-
-`index.php` 文件
+首先我们来看 `index.php` 中的通过 PDO 连接数据库这一段代码，我们将其封装为一个函数，放进到 `functions.php` 中, 如下：
 
 ```php
-<?php 
 
-require 'Task.php';
-
-try {
-    $pdo = new PDO('mysql:host=localhost;dbname=mytodo', 'username', 'my_password');
-} catch (PDOException $e) {
-    // 这里直接打印出具体的出错信息
-    die($e->getMessage());
-}
-
-$statement = $pdo->prepare('select * from todos');
-$statement->execute();
-$tasks = $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
-
-require 'index.view.php';
-```
-
-`index.view.php` 文件
-
-```php
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>index.view.php</title>
-</head>
-<body>
-    <ul>
-        <?php foreach ($tasks as $task) : ?>
-             <li>
-                <?php if ($task->completed) : ?>
-                    <strike> <?= $task->description; ?> </strike>
-                <?php else : ?>
-                    <?= $task->description; ?>
-                <?php endif; ?>
-             </li>
-        <?php endforeach; ?>
-    </ul>
-</body>
-</html>
-```
-
-`functions.php` 文件
-
-```php
-<?php
-
-function dd($data)
-{
-    echo '<pre>';
-    die(var_dump($data));
-    echo '</pre>';
-}
-```
-
-### 初步优化代码
-
-现在回头看 `index.php` 中的连接数据库和获取`todos`表中所有数据的代码，它们很凌乱，另外每次在别的文件中调用还需要重新写一遍，我们先把连接数据库的部分写成一个函数，放在`functions.php` 中
-
-```php
-function connectToDb()
-{
-    try {
-        // 实例化PDO，并将pdo的资源对象返回给调用者
-        return new PDO('mysql:host=localhost;dbname=mytodo', 'username', 'my_password');
-    } catch (PDOException $e) {
-        die($e->getMessage());
+    function connectToDb()
+    {
+        try {
+            return new PDO('mysql:host=localhost;dbname=mytodo', 'username', 'my_password');
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
     }
-}
 ```
-在 `index.php` 中调用这个函数
+
+然后将获取 `Tasks` 表中所有数据的代码也封装成一个函数，放在 `functions.php` 中，如下：
 
 ```php
 
-<?php 
-
-require 'functions.php';
-require 'Task.php';
-
-    // 通过调用 connectToDb() 获取其返回的 PDO 资源对象，并赋值给 $pdo
-    $pdo = connectToDb();
-
-    $statement = $pdo->prepare('select * from todos');
-    $statement->execute();
-    $tasks = $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
-
-    require 'index.view.php';
-```
-
-`index.php` 中的获取所有任务的三条代码也将其写成函数，放到`functions.php` 中
-
-```php
     function fetchAllTasks($pdo)
     {
-        $statement = $pdo->prepare('select * from todos');
+        $statement = $pdo->prepare('select * from tasks');
         $statement->execute();
+
         return $statement->fetchAll(PDO::FETCH_CLASS, 'Task');
     }
 ```
-`index.php` 中调用 `fetchAllTasks($pdo)`
+
+下面在 `index.php` 中引入 `functions.php` 和 `Task.php`, 并调用刚才定义好的两个函数, 现在还是得到相同的结果。
 
 ```php
-<?php 
+
+    <?php 
 
     require 'functions.php';
     require 'Task.php';
@@ -992,135 +979,72 @@ require 'Task.php';
     $pdo = connectToDb();
     $tasks = fetchAllTasks($pdo);
 
-    require 'index.view.php';
+    var_dump($tasks);
 ```
 
-## 重构以上优化后的代码
+## 第二次代码重构
 
-上面优化的代码貌似还可以了，但是上面的代码可以说属于面向过程的，只注重实现功能，代码的可读性和可维护性，易用性都很差，现代的 php 都是面向对象编程了，所以我们有必要对代码进行重构，代码重构的意思是在不影响功能的前提下对现有代码的结构进行改变，对类，方法进行重命名，对代码、接口进行抽取，对字段进行重新封装等。
+就眼前来看，第一次重构后的代码好像还挺清晰的，代码量也不多，但事实上像目前这样的代码是不具备可扩展和可复用性的。比如说像 `fetchAllTasks()` 这样的函数，这种函数基本没法复用，比如说想获取所有的评论呢？是不是也要写个`fetchAllComments()` 的函数？ 这样明显就有问题了。
 
-我们在看很多老外写的代码可以发现，他们的代码里一般会定义大量的类、接口、方法，类与类，类与接口之间很多是继承和实现的关系，方法的代码行数很少，超过20行代码的方法不多，看他们的代码感觉最多的就是方法之间的调来调去，不像我们很多人的代码，一个方法下来几十上百甚至两三百行都是最基本的语句构成，很少调用自己的方法。两相比较，可以看出，前者在结构上更清晰，通过类视图就可看出设计意图，并且总的代码量少于后者，而后者代码量庞大，代码冗余现象严重，结构不清晰，很难维护。
+另外一个严重的问题是我们没有基于面向对象开发，代码的可读性不高，不易于维护和扩展。我们先来重构和数据库相关的代码，目前我们只做了通过 PDO 连接数据库和查询数据库表所有数据的功能。我们先针对我们写好的两个函数一个个的来重构。
 
-我们主要来重构下面的两个函数:
-
-```php
-$pdo = connectToDb();
-$tasks = fetchAllTasks($pdo);
-```
-
-比如说，通常我们不应该编写 `fetchAllTasks()` 这样的函数，这种函数基本没法复用，比如说想获取所有的评论呢？是不是也要写个`fetchAllComments()` 的函数？ 这样明显就有问题了。
-
-上面的两个函数都是作用在数据库的，那么我们先建立一个`database`的文件夹，然后看`connectToDb()`函数,它的作用在于连接数据库 `Connect to Database`。
+既然这两个函数都是作用在数据库的，那么我们先在根目录下建立一个`database`的文件夹，然后看`connectToDb()`这个函数,它的作用在于连接数据库 `Connect to Database`。
 
 基于面向对象的编程，我们会需要一个类，然后使用类的一个方法去连接数据库，类名通常是一个名词，方法可以是一个动作，用英文说大只就是 `make a database connection`, 好了，那么我们就在`database`文件夹中创建一个 `Connection.php` 的文件，在当中声明一个`Connection` 的类， 并且它有一个`make()`的方法。
 
 ```php
-<?php 
 
-class Connection
-{
-    public static function make()
-    {
-        //code
-    }
-}
-```
-> 类名的编写规则才用大驼峰法，也就是所有的英文字母的首字母都大写。
-
-这里我们将`make()` 方法设置成静态的`(static)`, 静态方法可以用类名直接调用，不用实例化对象调用，如果不采用静态方法，我们需要这么调用：
-
-```php
-$connection = new Connection;
-$connection->make();
-```
-而静态方法，是这么被调用的
-
-```php
-Connection::make();
-```
-
-对于静态方法的使用，通常情况下需慎用，它可能会增大内存的开销，不过在这里的这种情况，使用静态方法我觉得还挺不错的。我们把这个类完善下
-
-```php
-<?php 
+    <?php 
 
     class Connection
     {
         public static function make()
         {
-            try {
-                return new PDO('mysql:host=localhost;dbname=mytodo', 'username', 'my_password');
-            } catch (PDOException $e) {
-                die($e->getMessage());
-            }
+            //code
         }
     }
 ```
 
-现在在 `index.php` 中，就可以调用它了
+> 类名的编写规则才用大驼峰法，也就是所有的英文字母的首字母都大写。
+
+这里我们将`make()` 方法设置成静态的`(static)`, 静态方法可以用类名直接调用，不用实例化对象调用，如果不采用静态方法，我们需要先通过 `new Connection` 去实例化一个 `Connection`的对象， 然后再去调用`make()` 方法。而使用静态方法，我们可以直接使用类名去调用方法, 类式这样 `Connection::make()`， 对于静态方法的使用，通常情况下需慎用，它可能会增大内存的开销，不过在这里的这种情况，使用静态方法还算可以，我们把这个方法完善下：
 
 ```php
-<?php 
 
-    require 'functions.php';
-    require 'database/Connection.php';
-    require 'Task.php';
-
-    $pdo = Connection::make();
-    $tasks = fetchAllTasks($pdo);
-
-    require 'index.view.php';
+    public static function make()
+    {
+        try {
+            return new PDO('mysql:host=localhost;dbname=mytodo', 'username', 'my_password');
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
 ```
 
-下面再来看`fetchAllTasks()`这个函数，刚才也说了这个函数不具备复用性，我们现在需要一个类，这个类最好能提供一些方便好用的查询方法给我们，它能将一些常用的`SQL`语句进行封装，这样在以后开发的时候我就不用再去写那些原生的，难于阅读和维护的原生`sql`语句, 既然这样，我们就需要重新构建一个查询的类，我们把这个取名为 `QueryBuilder`， 目前它还应该有一个`selectAll()`的方法。 在`database`文件夹下创建 `QueryBuilder.php`的文件
+下面再来看`fetchAllTasks()`这个函数，刚才也说了这个函数不具备复用性。其实我们现在是需要一个类，这个类最好能提供一些方便好用的查询方法给我们，它能将一些常用的`SQL`语句进行封装，这样在以后开发的时候我就不用再去写那些原生的，难于阅读和维护的原生`sql`语句, 既然这样，我们就需要重新构建一个查询的类，我们把这个取名为 `QueryBuilder`， 目前它还应该有一个`selectAll()`的方法。 在`database`文件夹下创建 `QueryBuilder.php`的文件，声明`QueryBuilder`类， 该类当中有一个`selectAll()`的方法， 如下：
 
 ```php
-<?php
 
     require 'Connection.php';
 
     class QueryBuilder
     {
-        public function selectAll($table, $model)
+        public function selectAll($table, $className)
         {
             $statement = Connection::make()->prepare("select * from {$table}");
 
             $statement->execute();
 
-            return $statement->fetchAll(PDO::FETCH_CLASS, $model);
+            return $statement->fetchAll(PDO::FETCH_CLASS, $className);
         }
     }
 ```
-`index.php` 中的代码如下
+
+这里的`Connection::make()`是硬编码式的写在这里的，如果`Connection`类修改了`make()`方法的名称，那么这里就会出错，同时在代码阅读体验上太差，不能一眼看出`Connection::make()`返回的结果是什么，还是需要和以前一样使用变量`$pdo`比较好。改成`$statement = $pdo->prepare("select * from {$table}");` 会好一些。
+
+这个`$pdo`变量在如何传递进来呢？放在`selectAll()`参数内? 这样显然不好，以后如果编写其他的方法还需要重复的传进来，其实可以说`QueryBuilder` 类中大多数方法都会依赖于 `PDO` 的这个资源对象，我们给`QueryBuilder`类定义一个 `PDO` 对象的属性，当`QueryBuilder` 创建的时候通过构造函数将 `$pdo` 对象自动赋值给`QueryBuilder`类的的 `$pdo`属性, 如下所示:
 
 ```php
-<?php 
-
-    require 'functions.php';
-    require 'database/QueryBuilder.php';
-    require 'Task.php';
-    
-    $tasks = (new QueryBuilder)->selectAll('todos', 'Task');
-
-    require 'index.view.php';
-```
-
-现在代码可以跑通， 但是`QueryBuilder`类中的这句代码好象还是有问题
-
-```php
-    $statement = Connection::make()->prepare("select * from {$table}");
-```
-
-这里的`Connection::make()`是硬编码式的写在这里的，如果`Connection`类修改了`make()`方法的名称，那么这里就会出错，同时在代码阅读体验上太差，不能一眼看出`Connection::make()`返回的结果是什么，还是需要和以前一样使用变量`$pdo`比较好。
-
-```php
-    $statement = $pdo->prepare("select * from {$table}");
-```
-
-这个`$pdo`变量在调用的时候该怎么传进来呢？放在`selectAll()`参数内? 这样不好，以后如果编写其他的方法还需要重复的传进来，嗯，`QueryBuilder` 类必须要依赖于 `PDO` 的一个资源对象，我们给`QueryBuilder`类定义一个 `PDO` 对象的属性，当`QueryBuilder`创建的时候自动给这个属性赋值,用构造函数可以解决，再改一下`QueryBuilder`类
-
-```php
-<?php
 
     class QueryBuilder
     {
@@ -1131,21 +1055,20 @@ Connection::make();
             $this->pdo = $pdo;
         }
 
-        public function selectAll($table, $model)
+        public function selectAll($table, $className)
         {
             $statement = $this->pdo->prepare("select * from {$table}");
 
             $statement->execute();
 
-            return $statement->fetchAll(PDO::FETCH_CLASS, $model);
+            return $statement->fetchAll(PDO::FETCH_CLASS, $className);
         }
     }
 ```
 
-`index.php` 中的代码
+下面我们修改下 `index.php` 中的代码， 将我们编写好的文件引入进来，如下：
 
 ```php
-<?php 
 
     require 'database/Connection.php';
     require 'database/QueryBuilder.php';
@@ -1157,13 +1080,14 @@ Connection::make();
 
     $tasks = $query->selectAll('todos', 'Task');
 
-    require 'index.view.php';
+    var_dump($tasks);
 ```
 
-这样会好一些，上面这种做法其实就是依赖注入，在很多的框架中都会使用到。现在`index.php` 还是太杂了，做的事太多了，像创建`PDO`和实例化查询构建器这种都属于引导程序，我们把它们独立出来，在根目录建立`bootstrap.php`
+### 创建引导文件
+
+现在我们会发现 `index.php` 中的代码变的很杂乱，面条式的代码，像创建`PDO`资源对象和实例化查询构建器这些代码都属于引导程序，我们把它们独立出来，在根目录建立`bootstrap.php`， 将这部分代码放入到该文件中，如下：
 
 ```php
-<?php
 
     require 'database/Connection.php';
     require 'database/QueryBuilder.php';
@@ -1172,70 +1096,51 @@ Connection::make();
         Connection::make()
     );
 ```
-再更改下`index.php`
+
+对应的修改下 `index.php` 中的代码如下：
 
 ```php
-<?php 
 
     $query = require 'bootstrap.php';
 
     require 'Task.php';
 
-    $tasks = $query->selectAll('todos', 'Task');
+    $tasks = $query->selectAll('tasks', 'Task');
 
-    require 'index.view.php';
+    var_dump($tasks);
 ```
+### 创建配置文件
 
-差不多就先这样重构吧！ 问题还是有，比如说`$tasks = $query->selectAll('todos', 'Task');` 这句就不够语义化，暂时先把`Task`这个参数去掉吧。
-
-## 查阅具体分支的代码
-
-这部分的代码在 https://github.com/zhoujiping/build-your-own-php-framework 的 `refactor` 上，你可以按下面的方法进行查阅。
-
-```bash
-# 克隆代码到本地
-git clone git@github.com:zhoujiping/build-your-own-php-framework.git
-# 切换到 refactor 分支
-git checkout refactor
-```
-
-## 使用配置文件
-
-我们现在是把连接数据库的用户名和密码以硬编码（hard code, 写死的意思）的方式放在`Connection`类中，这样做既不方便管理，同时也不安全，我们来建立一个`config.php`的配置文件， 在里面定义一个数组来存放这些配置
+现在的代码相对好很多了，不过我们现在是把连接数据库的用户名和密码以硬编码（hard code, 写死的意思）的方式放在`Connection`类中，这样做既不方便管理，同时也不安全，我们需要建立一个`config.php`的配置文件， 在当中我们建立一个关联数组来存放相关的配置信息，如下：
 
 ```php
-<?php 
 
-     return [
+    return [
         'database' => [
-            'name'          => 'mytodo',
+            'name'          => 'todolist',
             'username'      => 'username',
             'password'     => 'my_password',
             'connection'    => 'mysql:host=127.0.0.1',
-            'options'       => []
+            'options'       => [] // 这个一会再说它的作用
         ]
      ];
  ```
 
- 将 `Connection.php` 更改下
+ 对应修改 Connection 类中的 make() 方法：
 
  ```php
- <?php 
 
-    class Connection
+    public static function make($config)
     {
-        public static function make($config)
-        {
-            try {
-                return new PDO(
-                    $config['connection'] .';dbname=' . $config['name'],
-                    $config['username'],
-                    $config['password'],
-                    $config['options']
-                );
-            } catch (PDOException $e) {
-                die($e->getMessage());
-            }
+        try {
+            return new PDO(
+                $config['connection'] .';dbname=' . $config['name'],
+                $config['username'],
+                $config['password'],
+                $config['options']
+            );
+        } catch (PDOException $e) {
+            die($e->getMessage());
         }
     }
 ```
@@ -1243,7 +1148,6 @@ git checkout refactor
 我们给`make()`方法添加了参数，在`bootstrap.php` 中也要更改下
 
 ```php
-<?php
 
     $config = require 'config.php';
 
@@ -1255,225 +1159,197 @@ git checkout refactor
     );
 ```
 
-好了，这样可以跑通，在配置文件中我们加了个`'options'=> []` 的配置，这个是做什么用的呢？这里可以添加一些我们需要的额外配置，比如说 `$tasks = $query->selectAll('todos');
-` 这里如果我们传入一个不存在的数据表，按目前的代码，运行后没有任何的提示，我们把配置文件中的`options`设置下
+### 显示 PDO 执行出错的提示
+
+好了，这样可以跑通，在配置文件中我们加了个`'options'=> []` 的配置，这个是做什么用的呢？这里可以添加一些我们需要的额外配置，比如说在 `$tasks = $query->selectAll('tasks', 'Task');`这里如果我们传入一个不存在的数据表，按目前的代码，运行后没有任何的提示，我们把配置文件中的`options`设置下
 
 ```php
-    'options'       => [
+    'options' => [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]
 ```
 
-现在我们如果查询空表的话就能显示错误信息了，如下
+当 PDO 执行时产生的错误就能够提示出来了，比如我们传入一个不存在的表时， 就会出现下面这样的错误:
 
 ```
-Fatal error: Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mytodo.todoss' doesn't exist in /Users/zhoujiping/Code/php-learning/database/QueryBuilder.php:16 Stack trace: #0 /Users/zhoujiping/Code/php-learning/database/QueryBuilder.php(16): PDOStatement->execute() #1 /Users/zhoujiping/Code/php-learning/index.php(5): QueryBuilder->selectAll('todosS') #2 {main} thrown in /Users/zhoujiping/Code/php-learning/database/QueryBuilder.php on line 16
+
+    Fatal error: Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mytodo.todoss' doesn't exist in /Users/zhoujiping/Code/php-learning/database/
 ```
 
 > PDO::ATTR_ERRMODE的更多预设值访问  http://php.net/manual/en/pdo.setattribute.php 可以自己都试下
 
-## 编写路由 Router
+## 单一入口和mvc架构
 
-我们可以直接通过访问 php 文件的名字来运行 php 文件，我们建立 `about.php` 和 `contact.php`这两个文字，里面写一些 html 的代码， 然后通过 `http://localhost:8888/about.php` 就可以访问了。如果项目很小，就几张页面，而且逻辑不复杂， 这样做是可以的。如果逻辑复杂一点的，这么做就会有点难于维护了。按照现代 PHP 开发的规范，是需要统一入口文件的， 也就是说无论你访问哪一个URI，其实都是通过 `index.php` 这个文件进入的。 
+现在我们再来添加两张页面`about.php`和`contact.php`， 按照之前我们说的逻辑层和视图层分离的原则，我们还需要建立`about.view.php`和`contact.view.php`， 并在`about.php`和`contact.php`中引入它们的视图文件。然后我们可以通过`http://localhost:8888/about.php` 或 `http://localhost:8888/contact.php` 之类的 uri 来访问这些页面, 像这种方式我们称为多入口方式，这种方式对于小型项目还能管理，项目过大了，管理起来就会比较麻烦了。
 
-我们需要把现有的文件目录结构再优化下， 像`database` 内的文件，以及`bootstrap.php` 文件，这些都是属于一些核心的文件，我们可以建立一个文件夹叫做 `core`, 然后把`database`文件夹和 `bootstrap.php`放在这里面，然后我们之前也说过要把逻辑和视图分离开来，那么新建一个 `views` 的文件夹专门用来存放视图文件，对于视图文件我们需要规定下命名规则，目前就先统一为 `xxx.view.php` 这样的格式吧，针对逻辑层我们新建一个 `controllers` 的文件夹。在 `controllers`。
+现在的框架基本都是采用单一入口的模式，什么是单一入口，其实就是整个站点只有 `index.php` 这一个入口，我们访问的任何 uri 都是先经过 `index.php` 页面，然后在`index.php`中根据输入的 uri 找到对应的文件或者代码运行，然后返回数据。
 
-到目前为止，我们做了简单的检索生成器`QueryBuiler`, 可以和数据库打交道了，这一块也可以称呼为模型层`Model`, 我们还建立了控制逻辑的层`controllers`, 以及视图层`views`, 已经是往`MVC`这边靠了。
+我们把现有的文件目录结构再优化下， 像`database` 内的文件，以及`bootstrap.php` 文件，这些都是属于一些核心的文件，我们可以建立一个文件夹叫做 `core`, 然后把`database`文件夹和 `bootstrap.php`放在这里面，我们之前也说过要把逻辑和视图分离开来，那么新建一个 `views` 的文件夹专门用来存放视图文件，对于视图文件我们需要规定下命名规则，统一为 `xxx.view.php` 这样的格式，针对逻辑层我们新建一个 `controllers` 的文件夹。在 `controllers` 中存放逻辑层的文件。
 
-现在优化好的目录如下：
+根目录下再新建一个 `models` 的文件夹， 将`Task.php` 放入该文件夹中。
+
+`models`文件夹中的文件主要和数据打交道， `controllers` 文件夹内的文件主要用来处理业务逻辑，而`views`文件夹内的文件主要是用来显示数据所用的，这就是最基础的MVC架构。
+
+现在我们重新编排过的目录如下：
 
 ```php
-├── index.php    # 入口文件
-├── config.php   # 配置文件
-├── controllers  # 控制器层，写逻辑的地方
-├── core         # 一些核心文件
-│   ├── bootstrap.php
-│   └── database
-│       ├── Connection.php
-│       └── QueryBuilder.php
-└── views       # 视图层
-    └── index.view.php
+
+    ├── index.php
+    ├── config.php
+    ├── controllers
+    ├── core
+    │   ├── bootstrap.php
+    │   └── database
+    │       ├── Connection.php
+    │       └── QueryBuilder.php
+    ├── models
+    │   └── Task.php
+    └── views
 ```
 
-按照现在的结构，假设我们现在要访问一个路由为 `/about` 这样的页面，会发生什么事呢？ 首先根据统一入口规则，无论访问什么样的路由，都必须让它首先访问网站根目录下的 `index.php`, 事实上我们访问的`/about` 的路由全名应该是 `/index.php/about` 这样的。后期通过配置`Apache`或是`nginx`隐藏掉路由中的`index.php`,那么我们看见的路由就会变成`/about`了
+接下来怎么做？ 我们先来理一下思路，假定我们访问 `http://localhost:8888/about` 这个路由，是想让它运行`about.php` 中的内容，然后将最终的结果回显在浏览器上。步骤类式下面这样的：
 
-### 安装 valet 运行环境
+> 1. 访问 http://localhost:8888/about 这条路由时，首先会进入到 `index.php` 中。
+> 2. 然后在`index.php`中会通过一些方法去找到与这条路由对应需要执行的文件，一般我们都会把这些文件放在控制器中
+> 3. 执行控制器文件中的逻辑代码，最终将数据通过对应的视图层显示出来。
 
-> 在Mac系统上，可以安装 `valet` 开发环境，它已经帮我们配置好了这些，安装说明 https://laravel.com/docs/5.4/valet 
+事实上我们访问的`http://localhost:8888/about`, 它的真正的路由应该是类式`http://localhost:8888/index.php?action=about`这样的路由，然后通过`Apache`或者是`Nginx`做路由跳转，就可以实现成类式`http://localhost:8888/about`这样的路由了。具体的设置可以自行 Google. 
 
-先用 `valet` 生成一个 `my-php-framework.dev` 的本地域名，以后就用这个域名来运行。
+如果你使用的也是`valet`集成开发环境, 我们可以在项目根目录使用命令 `valet link my-php-framework` 生成一个 `my-php-framework.dev` 的本地域名，以后就用这个域名来运行。
 
-### 统一入口页面
+现在根据上面我们整理的步骤，我们一步一步的来实现它们，首先我们先在`controllers`下新建`index.php, about.php和contact.php`, 在`views`文件夹下建立它们对应的视图文件， 视图文件中先编写些 html 代码，能区分页面就行，控制器中的文件只需要写一句将对应的视图文件引入进来的代码即可，如`require views/xxx.view.php;`。
 
-首先改写下 `index.php` 的内容, 因为是入口文件，所以要引入`bootstrap.php`引导文件
+## 编写路由类 Router
+
+按照上面的步骤，第一步很好解决，这里不做说明，可以自行 Google, 或者你如果安装的是 Valet 集成环境，只需要按照我上面的一条命令即可，不用进行任何额外的配置。
+
+我们主要来看第二步，如何将路由与控制器中的类对应起来，其实这也很简单，我们之前学过关联数组，我们只要定义一个关联数组将相对路径，如`about` 作为 key, 将控制器中对应的类的路径做为 value 保存起来即可。然后我们只要获取到用户输入的 uri, 通过这个 uri 中的相对路径去到我们定义好的关联数组中去查找对应的 value 值，就能找到这条路由对应的控制器类的文件，最后将其引入进来执行，就能完成这样的功能了。
+
+基于面向对象的开发方式，我们首先会需要一个路由的对象 `$router`, 这个对象会有一个`$routes`的属性用来存放关联数组，还会需要有一个`$router->define()`的方法，这个方法的主要作用是将我们定义的关联数组赋值给`$router->routes`属性，最后还需要一个`$router->direct()`的方法， 这个方法的作用是通过用户输入的 uri 返回对应的控制器类的路径。
+
+现在我们假定我们需要的对象和方法都已经已经存在了，我们先去根目录下的`index.php`中调用它们，如下：
 
 ```php
-<?php 
-    //index.php
 
+    // 加载引导文件，并且获取创建好的 `QueryBuilder` 的对象
     $query = require 'core/bootstrap.php';
 
-    die('无论你访问什么url,都会先访问index.php文件');
+    // 创建路由对象
+    $router = new Router;
+
+    // 定义路由
+    $router->define([
+        '' => 'controllers/index.php',
+        'about' => 'controllers/about.php',
+        'contact' => 'controllers/contact.php'
+    ]);
+
+    // 引入 与相对路径 $uri 对应的控制器类的路径
+    // 比如说相对路径如果是 about， 下面这句代码就等价于 require 'controllers/about.php';
+    // 这里还存在一个问题，$uri 的值我们如何获得，后面再解决它
+    require $router->direct($uri);
 ```
 
-因为我们改了目录结构， 所以注意也要把`core/bootstrap.php` 中引入文件的路径也改正确, 如果使用 `valet` 的运行环境，现在就达到我们的要求了，比如我访问 `http://my-php-framework.dev/about`, 它会显示出`index.php`中的这句话。
+> 注意： 我们之前更改了很多文件的目录，自己查看并修正下 `require` 文件的路径。
 
-![统一入口页面](/images/php/step_1/7.jpg)
-
-接下来的事，应该是通过路由去找到控制器中对应的文件，控制器处理完逻辑，将数据让视图层来显示出来，我们在`controllers`中建立`about.php`, 在`views`中建立`about.view.php`文件, 下面是`about.php` 中的内容
+下面我们就可以去实现我们的类了，很明显，`Router` 类也是属于核心文件中的，我们在`core` 文件夹下建立一个`Router.php` 的文件，我们实现上面的两个方法，如下：
 
 ```php
-<?php
 
-// controllers/about.php
-
-require 'views/about.view.php';
-```
-
-### 路由分发
-现在回到 `index.php` 入口页面，当用户访问`／about` 这条路由的时候，需要运行与`/about`相关的页面代码，我们已经将逻辑代码放在了`controllers/about.php`中了，现在需要程序能够正确的将`controllers/about.php`的内容包含进来运行，我们可以使用关联数组将路由和实际的控制器文件路径对应起来。
-
-```php
-$routes = [
-    'about' => 'controllers/about.php'
-];
-```
-
-当用户访问'/about'的时候，通过这个数组的`about`健就可以拿到`'controllers/about.php'`这个路径了。
-
-我们先把这个路由数组单独放在一个文件中，命名为`routes.php`, 一个项目会有很多的路由存在，不要把它和别的逻辑杂合在一起。
-
-现在要考虑怎么样做出这个路由的功能，基于面向对象的开发思想，我们首先会想到应该会存在一个`$router`的对象，这个对象有一个`define`的方法，将上面的代码改写下，如下：
-
-```php
-$router->define([
-    ''        => 'controllers/index.php',
-    'about'   => 'controllers/about.php',
-    'contact' => 'controllers/contact.php',
-]);
-```
-
-上面多定义了几个路由，自己加上对应的文件，既然需要`$router`的对象， 那应该需要一个`Router`的类，它也应该属于核心文件中的，我们在`core`文件夹中建立 `Router.php` 文件， 并先声明这个对象.
-
-```php
-<?php
-
-    class Router 
+    class Router
     {
-        protected $routers =[];
+        protected $routes = [];
 
         public function define($routes)
         {
             $this->routes = $routes;
         }
+
+        public function direct($uri)
+        {
+            // 如果数组中存在 $uri 这样的路由, 那么返回对应的路经
+            if (array_key_exists($uri, $this->routes)) {
+                return $this->routes[$uri];
+            }
+            
+            // 不存在，抛出异常，以后关于异常的可以自己定义一些，比如404异常，可以使用NotFoundException
+            throw new Exception('No route defined for this URI');
+        }    
     }
 ```
 
-在`bootstrap.php`中我们要通过`require 'core/Router.php';`引入这个`Router.php`的文件,接下来在入口文件中创建`$router`这个对象，并调用`$router-define()`这个方法。
+## 获取浏览器访问网址中的相对路径
 
-```php
-<?php 
-
-    $query = require 'core/bootstrap.php';
-
-    $router = new Router;
-    
-    // $router调用define的代码都放在了routes.php中了，require进来就可以了。
-    require 'routes.php';
-
-```
-
-到现在我们已经有了`$router`对象了，所有的路由也会在入口文件加载的时候通过`$router->define()`方法被赋值到`$router`的`$routes`属性中，下面我们只需要 `require` 路由对应的控制器类即可。
-
-我们还会需要一个能够通过路由返回控制器类的实际路径的方法，方法就叫做`direct()`吧，先在入口页调用这个方法，然后再去实现它。
-
-```php
-<?php 
-
-    // 加载引导文件，并且获取创建好的 `QueryBuilder` 的对象
-    // 以后对数据库操作可以使用编写好的 `QueryBuilder` 的对象对方法
-    $query = require 'core/bootstrap.php';
-
-    // 创建路由对象
-    $router = new Router;
-
-    // 将自定义的路由赋给 $router 对象的$routes属性
-    require 'routes.php';
-
-    // 这里其实就是包含具体的控制器文件中的代码，因为['about' => 'controllers/about.php']
-    // 这里相当于 require 'controllers/about.php`;
-    require $router->direct('$uri');
-```
-
-接下来去实现`direct()` 这个方法， 在`Router` 类中编写下面的代码：
-
-```php
-<?php
-
-    public function direct($uri)
-    {
-        // 如果数组中存在 $uri 这样的路由, 那么返还对应的值
-        if (array_key_exists($uri, $this->routes)) {
-            return $this->routes['$uri'];
-        }
-        
-        // 不存在，抛出异常，以后这里改成 404 异常
-        throw new Exception('No route defined for this URI');
-    }
-```
-
-我们尝试把入口页面的`require $router->direct('$uri');`的 `$uri` 改成 `about`路由，能够正确的现实 about 的页面， 改成 `contact`, 能够访问 contact 页面了，改成`no-uri` 这样为定义的路由，就会抛出异常，差不多能实现我们的功能了。
-
-### 获取用户输入的 uri
-现在的问题是用户在浏览器输入 `http://my-php-framework.dev/about` 或者是 `http://my-php-framework.dev/contact`, 我们怎么拿到这个 uri呢? 在 php 中有一个 全局的 `$_SERVER` 变量, 我们在入口页面加上`var_dump($_SERVER);` 打印出它的值.
+到目前为止差不多已经实现了我们的功能，不过上面说了还有一个问题，就是`$uri`的值我们还没有获得，如何获取它呢？
+比如说用户在浏览器输入 `http://my-php-framework.dev/about` 这条 uri，我们如何获取当中的相对路径`about`, 在 php 中有一个 全局的 `$_SERVER` 变量, 我们可以在入口页面加上`var_dump($_SERVER);` 打印出它的值来查看一下.
 
 ![var_dump](/images/php/step_1/8.jpg)
 
-可以在`$_SERVER['REQUEST_URI']` 中获取我们要的 uri, 不过需要去掉字符串前的 `/`,可以使用 `trim($string)`函数来处理，`trim($string)` 默认去掉 $string 字符串两边的空格，但如果`trim($string, '/')`这样，就可以去掉字段串前后的 `/`  字符。 现在我们可以正确的得 `$uri` 了。
+可以在`$_SERVER['REQUEST_URI']` 中获取我们要的 uri, 不过需要去掉字符串前的 `/`, 我们可以使用 PHP 提供的 `trim($string)`函数来处理，`trim($string)` 默认去掉 $string 字符串两边的空格，但如果`trim($string, '/')`这样，就可以去掉字段串前后的 `/`  字符。 这样就我们可以正确的得 `$uri` 了，我们在入口页面上添加上这条代码：
 
 ```php
-<?php
-
-    $uri = trim($_SERVER['REQUEST_URI'], '/');
-```
-
-入口页面 `index.php` 代码如下：
-
-```php
-<?php 
 
     // 加载引导文件，并且获取创建好的 `QueryBuilder` 的对象
-    // 以后对数据库操作可以使用编写好的 `QueryBuilder` 的对象对方法
     $query = require 'core/bootstrap.php';
 
-    // 获取用户在地址栏输入的 uri 并去除头尾的 / 字符
+    // 获取用户在地址栏输入的相对路径，并去除头尾的 / 字符
     $uri = trim($_SERVER['REQUEST_URI'], '/');
 
     // 创建路由对象
     $router = new Router;
 
-    // 将自定义的路由赋给 $router 对象的$routes属性
-    require 'routes.php';
+    // 定义路由
+    $router->define([
+        '' => 'controllers/index.php',
+        'about' => 'controllers/about.php',
+        'contact' => 'controllers/contact.php'
+    ]);
 
-    // 这里其实就是包含具体的控制器文件中的代码，因为['about' => 'controllers/about.php']
-    // 这里相当于 require 'controllers/about.php`;
+    // 引入 与相对路径 $uri 对应的控制器类的路径
+    // 比如说相对路径如果是 about， 下面这句代码就等价于 require 'controllers/about.php' 
     require $router->direct($uri);
 ```
 
-### 优化路由功能部分的代码
+> 不要忘记在 `bootstrap.php` 中将 `Router.php` 引入进来。
 
-最基础的路由功能我们已经实现了，我们把入口页面的代码再优化下，我们理一下，我们其实是加载`routes.php`文件，然后返回其内数组的健所对应的值，我们写一句可读性好点的代码：
+## 第三次代码重构
+
+### 将路由定义独立出来
+
+我们已经实现了单一入口和路由分发的功能，不过我们的代码还没有经过优化，我们看入口页面中的定义路由的这段代码:
 
 ```php
-<?php
-    // 链式调用
-    require Router::load('routes.php')
-                  ->direct($uri);
+
+    $router->define([
+    '' => 'controllers/index.php',
+    'about' => 'controllers/about.php',
+    'contact' => 'controllers/contact.php'
+    ]);
+
+一个稍微大点的 App 都会存在很多的路由，我们可以预见这段代码会不限量的增加，所以我们需要把这段代码独立出来，另外一点是我们往往可以通过路由就行大致的了解整个App的大致情况，所以将路由独立成一个页面是非常有必要的。  我们在根目录下创建`routes.php` 的文件，将这段代码移过去。然后在入口页面引入进来就可以了。再继续看入口页面的这三句代码：
+
+```php
+
+    $router = new Router;
+    require 'routes.php';
+    require $router->direct($uri);
 ```
 
-这里的`Router::load('routes.php')`的功能是将`routes.php`中的数组赋给`$router->routes`属性，然后返回`$router`对象，`$router`再调用`direct($uri)`方法。看一下 `Router` 类中的 `load` 方法:
+这三句代码还是面条式的，语言化不强，我们如果将`require 'routes.php';` 封装成`$router->load('router.php')`, 可读性就会好很多，同时我们让`load()`方法返回`$router`对象，那么就可以通过链式调用`direct()`方法，我们再把`load()`方法写成静态的，那么实例化 $router 对象的代码也可以省略了，最终可以将代码写成这样：
 
 ```php
+
+    // 链式调用
+    require Router::load('routes.php')
+                   ->direct($uri);
+```
+
+> 这里将 `load()` 方法写成静态的还是有好处的，因为 $router 对象在整个 App 中并不需要多个，如果采用实例化对象的方式，我们也需要使用单列模式，而不是像之前那样实例化对象。
+
+我们去实现 `Router` 类的 `load()` 方法:
+
+```php
+
     public static function load($file)
     {
         $router = new static;
@@ -1486,70 +1362,63 @@ $router->define([
     }
 ```
 
-## 将 Request 分离出来
+### 将请求 Request 分离出来
 
-我们再来看 `$uri = trim($_SERVER['REQUEST_URI'], '/');`  这句代码，这种代码放这里的可读性太差了，任何人读到这里都会卡顿，如果把这句话换成 `Request::uri()` 那就语义话了。
-这样入口文件就只有两句代码了.
+通过一次http请求的周期一般是发送 Request 请求， 服务器处理，然后响应客户端 Response, 从整体来看，我们是还需要`Request`和`Response`两个类的，类中需要编写有针对请求和响应的各种方法。这里先不做扩张，以后再看吧！
+
+不过我们来看下入口页面的 `$uri = trim($_SERVER['REQUEST_URI'], '/');`  这句代码，它就属于http请求的范畴，我们可以编写`Request::uri()`这样的方法来代替它。我们还是先调用再去实现具体的方法，入口页面现在的代码如下：
 
 ```php
-<?php 
 
-$query = require 'core/bootstrap.php';
+    $query = require 'core/bootstrap.php';
 
-require Router::load('routes.php')
-    ->direct(Request::uri());
+    require Router::load('routes.php')
+        ->direct(Request::uri());
 ```
 
-我们来编写在`uri()` 方法， 在`core`下建立一个`Request.php`的类文件
+下面我们在`core`目录下建立 `Request.php` 并且实现静态的 `uri()` 方法, 如下：
 
 ```php
-<?php
 
-class Request
-{
-    public static function uri()
+    class Request
     {
-        return trim($_SERVER['REQUEST_URI'], '/');
+        public static function uri()
+        {
+            return trim($_SERVER['REQUEST_URI'], '/');
+        }
     }
-}
 ```
 
-好了，别忘记了在`bootstrap.php`中引入`Request.php`这个类。
+> 别忘记了在`bootstrap.php`中引入`Request.php`这个类。
 
-## 优化下 bootstrap.php 文件中的变量 $config
+### 优化 bootstrap.php 文件中的变量 $config
 
-看这句代码 `$config = require 'config.php';` 因为我们现在才用统一入口页面了，所以一个站点就是一个应用(APP), 因此这里的 `$config` 变量的生命周期很长，你会发现你再控制器类中可以使用它，在视图文件中也可以使用它，那么我们把这类的变量都放在一个`$app`的数组中应该会好一些,如下：
+我们现在采用单一入口模式开发一个 Web App, 因此`bootstrap.php`中的`$config`这个变量的生命周期会很长，几乎就是一个全局变量了，你会发现你再控制器类中可以使用它，在视图文件中也可以使用它，我们把这个变量命名成`$app['config']` 这样的可读性会好很多，现在`bootstrap.php`中的代码如下：
+
 ```php
-<?php
-// bootstrap.php
 
     $app = [];
-
     $app['config'] = require 'config.php';
-
-    require 'core/Router.php';
-    require 'core/Request.php';
     require 'core/database/Connection.php';
     require 'core/database/QueryBuilder.php';
+    require 'core/Router.php';
+    require 'core/Request.php';
 
     return  new QueryBuilder(
         Connection::make($app['config']['database'])
     );
 ```
-## 重构后的代码和添加路由功能的版本 router
 
-我把上面的代码放在了 `router` 分支上，使用`git checkout router` 可以切换到上面的代码.
 
 ## 视图文件的拆分
 
-通常一张视图文件都会包含一些重复的部分，如头部，底部，导航条等，为方便维护，这些部分都会把它们独立出来，比如我们现在为每个页面添加导航菜单。 在`views`下新建`partials`文件夹，然后先建立一个`nav.php`,用来存放导航条
+通常一张视图文件都会包含一些重复的部分，如头部，底部，导航条等，为方便维护，这些部分都会把它们独立出来，比如我们现在为每个页面添加导航菜单。 在`views`下新建`partials`文件夹，然后先建立一个`nav.php`,用来存放导航条, 如下：
 
 ```html
 <nav>
     <ul>
         <li><a href="/">Home</a></li>
         <li><a href="/about">About</a></li>
-        <li><a href="/about/zhoujiping">About Zhoujiping</a></li>
         <li><a href="/contact">Contact</a></li>
     </ul>
 </nav>
@@ -1559,199 +1428,47 @@ class Request
 
 ## CSS和JS文件
 
-网站的css和js以及一些静态的资源文件我们在根目录下建立一个`public`的文件夹，然后分别建立对应的文件夹，其实`index.php`文件后期我们也要放在这里，后期会把网站的根目录指向这里，`css`和`js`文件我们可以通过`gulp`或者`webpack`将其打包后放在这里，这样我们网站的安全性会高很多。这里的文件夹自己建立，然后在`views`页面中引入进来即可。现在看下`index.view.php`页面，是不是清晰了很多, 其实用原生的php加上替代语法写视图文件也可以比较清晰的。我们自己的小项目很多时候并不用去选择框架做，自己搭建一个简单的框架去做，那样是最轻量的，开发效率也还是比较快的。
-
-```php
-
-    <?php require 'partials/head.php'; ?>
-    <?php require 'partials/nav.php'; ?>
-
-    <h1>Home Page</h1>
-
-    <ul>
-        <?php foreach ($tasks as $task) : ?>
-             <li>
-                <?php if ($task->completed) : ?>
-                    <strike> <?= $task->description; ?> </strike>
-                <?php else : ?>
-                    <?= $task->description; ?>
-                <?php endif; ?>
-             </li>
-        <?php endforeach; ?>
-    </ul>
-
-    <?php require 'partials/footer.php'; ?>
-```
+对于网站的css和js以及一些静态的资源文件，我们可以在根目录下建立一个`public`的文件夹，`css`和`js`文件我们可以通过`gulp`或者`webpack`将其打包后放在这里，然后在`views`页面中引入进来即可。另外根目录下的入口文件`index.php`也应该放置在这里，然后将站点的根目录指向`public`，这样会安全很多，不过这里我们就不这么操作了。
 
 > 小问题： 上面的`nav.php`是可以在`head.php`中就包含的，但是通常我更喜欢把它们分开`head.php`基本对应`<head>`部分，我不想把`<body>` 中的也融合进去，有必要的话我会建立`head.php`和`header.php`两个文件，在`header.php`中在包含`nav.php`，或者将`nav.php`的内容直接放在`header.php`中，我感觉文件的命名和内部的内容需要对应，这样可读性会好些。
 
-## php 常用操作数组的函数 `array_filter`, `array_map` 和 `array_colum`
+## 解决路由中存在的一些问题
 
-### array_filter - 用回调函数过滤数组中的单元
+我们现在只做了显示 todolist 的列表，那如果要像数据库插入一条任务呢？先在`index.view.php`中添加一个表单，如下：
 
-这三个函数在`laravel`的源码中也用的挺多的，我们来讨论下，首先 `array_filter`，官方说明地址: http://www.php.net/manual/zh/function.array-filter.php 
+```html
 
-** 用法： **
-
-```php
-array array_filter ( array $array [, callable $callback [, int $flag = 0 ]] )
-
-// 代码中的写法一般为:
-
-$array_filter_result = array_filter($array, function ($item) { // code });
-```
-
-** 解析：**
-
-依次将 array 数组中的每个值传递到 callback 函数。如果 callback 函数返回 true，则 array 数组的当前值会被包含在返回的结果数组中。数组的键名保留不变。 如果没有提供 callback 函数， 将删除 array 中所有等值为 FALSE 的条目。这句话的意思是 `array_filter($array)` 可以返回值为空，为false
-
-** 举例 **
-
-一个博客的帖子会有发布状态和未发布状态，如下:
-
-```php
-<?php 
-
- class Post
- {
-        public $title;
-
-        public $published;
-
-        public function __construct($title, $published)
-        {
-            $this->title = $title;
-
-            $this->published = $published;
-        }
-     }
-
-     $posts = [
-        new Post('My First Post', true),
-        new Post('My Second Post', true),
-        new Post('My Third Post', true),
-        new Post('My Fourth Post', false),
-     ];
-```
-
-下面筛选出未发布的帖子
-
-```php
- $unPublishedPosts = array_filter($posts, function ($post) {
-    return $post->published === false;
- });
- ```
-按照需求代码是上面这样的，优化下:
-
-```php
- $unPublishedPosts = array_filter($posts, function ($post) {
-    return ! $post->published;
- });
-
-我们如果打印`$posts`的值，发现是没有改变的，所以`array_filter`是不会改变原数组的值的，所以在回调函数中不要去改变原数组，否则会出现未知错误。
-
-### array_map 为数组的每个元素应用回调函数
-
-** 用法 **
-
-```php
-array array_map ( callable $callback , array $array1 [, array $... ] )
-```
-
-** 说明 **
-
-`array_map()`：返回数组，是为 array1 每个元素应用 callback函数之后的数组。 callback 函数形参的数量和传给 array_map() 数组数量，两者必须一样。 文档地址 http://php.net/manual/zh/function.array-map.php
-
-** 例子 **
-
-如果要把所有的帖子都设置成发布状态，那就可以使用`array_map` 来操作
-```php
-$modifyPosts = array_map(function ($post) {
-    $post->published = true;
-    return $post;
-}, $posts);
-```
-
-`array_map` 很大的一个作用可以用来处理接口返回的数据，比如我想`$published` 返回的值为`1`或`0`可以这样：
-
-```php
- $modifyPosts = array_map(function ($post) {
-    $post->unpublished ? $post->published = 1 : $post->published = 0;
-    return $post;
-}, $posts);
-```
-
-### array_column — 返回数组中指定的一列
-
-文档 http://php.net/manual/zh/function.array-column.php
-
-比如我想返回所有的帖子标题， 我们可以通过 `array_map()` 来做到这点 
-
-```php
-
-     $titles = array_map(function ($post) {
-        return $post->title;
-    }, $posts);
-```
-
-用`array_column` 就更简单了
-```
-$titles = array_column($posts, 'title');
-```
-> 上面的$title 是针对 public 属性的才有效， 如果是`protected`或`private`属性的，类需要实现 __get() 和 __isset() 魔术方法，具体看文档。
-
-`array_column()` 还可以添加第三个参数，第三个参数会作为 `title` 的 key 返回, 我们在`Post`类中加一个 `author`的属性，然后将代码改成这样：
-
-```php
-    $titles = array_column($posts, 'title', 'author');
-```
-返回的数据中会变成`author`, `title`为值的关联数组。
-
-## 解决路由中已知的一些问题
-
-开发 web 项目， 表单`form`是肯定少不了的，我们在`index.view.php`上写一个简单的来测试, 先来测试 `GET` 方式
-
-```php
-    <?php require 'partials/head.php'; ?>
-    <?php require 'partials/nav.php'; ?>
-
-    <h1>Submit Your Name</h1>
-
-    <form action="/names" method="GET">
-        <input type="text" name="name">
+    <form action="/tasks" method="GET">
+        <textarea name="description" id="description" cols="50" rows="3"  required></textarea>
         <button type="submit">Submit</button>
     </form>
-
-    <?php require 'footer.php'; ?>
 ```
 
-`routes.php` 中添加上对应的`names` 路由
+在`routes.php` 中添加上对应的`tasks` 路由
 
 ```php
-<?php
 
     $router->define([
-        ''                  => 'controllers/index.php',
-        'about'             => 'controllers/about.php',
-        'about/zhoujiping'  => 'controllers/about-zhoujiping.php',
-        'contact'           => 'controllers/contact.php',
-        'names'             => 'controllers/add-name.php'
+        ''          => 'controllers/index.php',
+        'about'     => 'controllers/about.php',
+        'contact'   => 'controllers/contact.php',
+        'tasks'     => 'controllers/add-task.php'
     ]);
 ```
 
-在控制器中建立`add-name.php`, 先输入 `var_dump($_SERVER)`, 然后测试一下，毫无悬念的出错了
-![路由出错](/images/php/step_1/9.jpg)
-
-出错原因是提示找不到路由，这很正常，我们之前的思路是以用户输入的`uri`的`path`为`key`, 去寻找`$router->routes`数组中对应的值是否存在，我们在`Request.php`中的`uri()`方法出了问题。我们现在的方法是这样的。
+在控制器中建立`add-task.php`, 先输入 `var_dump($_SERVER)`, 测试一下，毫无悬念的出错了，出错原因是提示找不到路由，这很正常，我们之前的思路是以用户输入的`uri`的相对路径为`key`, 去寻找`$router->routes`数组中对应的值是否存在，我们在`Request.php`中的`uri()`方法出了问题。我们现在的方法是下面这样的：
 
 ```php
+
     public static function uri()
     {
         return trim($_SERVER['REQUEST_URI'], '/');
     }
 ```
 
-我们只是去除了 uri 两端的 `/` 字符， 而现在的 uri 是 `/names?name=zhoujiping` 去除了两头的`/`, 那就变成了`names?name=zhoujiping`, 而我们定义的路由是`names`, 所以肯定是找不到的，现在我们需要提取出正确的 `path`,可以使用 php 的原生函数 `parse_url` 函数的官方文档在这里  http://www.php.net/manual/en/function.parse-url.php 通过 `parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); 就可以得到正确的 `/names` 了，然后再去除两端的 `/`, 关于 `PHP_URL_PATH` 常量的意思，查下文档就行。现在 `uri()` 改成如下：
+我们只是去除了 uri 两端的 `/` 字符， 而现在的 uri 是 `/tasks?description=test` , 当去除它两端的`/`, 那就变成了`tasks?description=test`, 而我们定义的路由是`tasks`, 所以肯定是找不到的。
+
+需要提取出我们需要的相对路径，可以使用 php 的原生函数 `parse_url` 函数的官方文档在这里  http://www.php.net/manual/en/function.parse-url.php 通过 `parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);` 就可以得到正确的 `/tasks` 了，然后再去除两端的 `/`, 关于 `PHP_URL_PATH` 常量的意思，查下文档就行。现在 `uri()` 改成如下：
 
 ```php
 
@@ -1763,133 +1480,119 @@ $titles = array_column($posts, 'title');
     }
 ```
 
-现在在测试一下，没有问题了，下面把`index.view.php` 中的 `form method` 改成`post`, 然后将`add-name.php`中的内容改成`var_dump($_REQUEST);` 这里的 `$_REQUEST` 可以接受通过`get`或是 `post` 方法传递来的参数值。我们通过表单提交（post 请求方式）后可以正确访问，没有问题，但是我们刷新页面，请求方式变成了`get`, 还是能显示页面，这是我们不希望看见的，我们希望这条路由仅仅提供给 `post` 方式， 而别的请求方式是不能访问的。这一步我们还没有做。
-
-假设在路由页面 `routes.php` 我们的路由可以这么写：
+现在再测试一下，没有问题了。 下面把 `index.view.php` 中的表单发送方式改成`post`, 然后将`add-task.php`中的内容改成`var_dump($_REQUEST);` 这里的 `$_REQUEST` 可以接受通过`get`或是 `post` 方法传递来的参数值。我们通过表单提交（post 请求方式）后可以正确访问，没有问题，但是我们刷新页面，请求方式变成了`get`, 还是能显示页面，这是我们不希望看见的，如何解决这个问题呢？显然我们要去修改 Router 类的`define()` 方法，基本上我们会想到给`define()` 再新添加一个参数做为标识符来解决这个问题，但是这样使用起来就太麻烦了，假定 `Router` 类中有`get()`和`post()` 两个方法可以解决这个问题，那调用起来就会方便很多，而且代码可读性也非常强，我们先去 `routes.php` 中调用，回头再来编写这两个方法，现在 `routes.php` 中代码如下：
 
 ```php
-<?php
 
     $router->get('', 'controllers/index.php');
     $router->get('about', 'controllers/about.php');
-    $router->get('about/zhoujiping', 'controllers/about-zhoujiping.php');
     $router->get('contact', 'controllers/contact.php');
-    $router->post('names', 'controllers/add-name.php');
+    $router->post('tasks', 'controllers/add-task.php');
 ```
 
-如果我们的`$router`对象具有`get()`和`post()` 方法，通过这些方法能指定路由的请求方式，那之前的问题就能解决了。解决的思路：
+嗯，这样以来，代码的可读性也好了很多，下面我们就来想想如何实现 `Router` 类的`get()`和`post()`方法，大体思路如下：
 
-1. 在`$router->routes` 数组中定义 key 为`GET` 和 `POST` 的一维数组
-2. 建立`get` 方法，将`get`方式的路由放进`GET`数组中
-3. 建立`post`方法，将`post`方式的路由放进`POST`数组中
-4. 判断用户访问的路由的请求方式，根据请求方式和 path 对应到`GET`或是`POST`数组中查询 path 对应的值返回。
+> 1. 在`$router->routes` 数组中定义 key 为`GET` 和 `POST` 的一维数组
+> 2. 建立`get` 方法，将`get`方式的路由放进`GET`数组中
+> 3. 建立`post`方法，将`post`方式的路由放进`POST`数组中
+> 4. 判断用户访问的路由的请求方式，根据请求方式和相对路径分别对应到`GET`或是`POST`数组中查询相对路径对应的值返回。
 
-需要更改的地方及代码如下：
 
-** index.php **
+Router 类中需要修改和添加的代码如下：
 
 ```php
 
-// require Router::load('routes.php')->direct(Request::uri());
-
-// 修改为
-
-require Router::load('routes.php')
-    ->direct(Request::uri(), Request::method());
+    protected $routes = [
+        'GET'   => [],
+        'POST'  => []
+    ];
+    
+    // 当定义Get路由时候，把对应的$uri和$controller以健值对的形式保存在$this->routes['GET']数组中
+    public function get($uri, $controller)
+    {
+        $this->routes['GET'][$uri] = $controller;
+    }
+    
+    // 当定义POST路由时候，把对应的$uri和$controller以健值对的形式保存在$this->routes['POST']数组中
+    public function post($uri, $controller)
+    {
+        $this->routes['POST'][$uri] = $controller;
+    }
 ```
 
-** Request.php 添加 method() 方法**
+现在我们要判断实际访问的路由是哪种请求方式，如果是`GET` 请求，我们则去`$this->routes['GET']`数组中查询相对路径对应值，如果是`POST` 请求，我们则去`$this->routes['POST']`数组中查询相对路径对应值，所以 Router 类中的`direct()` 方法我们还需要改写下,如下:
 
 ```php
+    
+    // 这里的 $requestType 是请求方式，GET 或者是 POST
+    // 通过请求方式和 $uri 查询对应请求方式的数组中是否定义了路由
+    // 如果定义了，则返回对应的值，没有定义则抛出异常。
+
+    public function direct($uri, $requestType)
+    {
+        if (array_key_exists($uri, $this->routes[$requestType])) {
+            return $this->routes[$requestType][$uri];
+        }
+        
+        throw new Exception('No route defined for this URI');
+    }   
+``` 
+
+入口页面调用`direct()`方法的地方，需要加上第2个参数，如下：
+
+```php
+
+    require Router::load('routes.php')
+        ->direct(Request::uri(), Request::method());
+```
+
+看上面的 `Request::method()` 这个方法是用来获取访问的路由的请求方式的，这也属于 `Request` 的范畴，所以我们在`Request`中去实现这个方法。实现方式非常的简单，不用解释，如下：
+
+```php
+
     public static function method()
     {
         return $_SERVER['REQUEST_METHOD'];
     }
 ```
 
-** Router.php 删除 define() 方法， 修改 routes 属性， 添加 get() 和 post() 方法， 修改 direct() 方法**
+到目前为止，路由中存在的一些问题已经解决了，下面我们需要把 form 表单传递过来的数据插入到数据库中。
 
-```php
-<?php
-
-    class Router 
-    {
-        protected $routes =[
-            'GET'  => [],
-            'POST' => []
-        ];
-
-        public static function load($file)
-        {
-            $router = new static;
-            
-            // 调用 $router->define([]);
-            require $file;
-
-            return $router;
-        }
-
-        public function get($uri, $controller)
-        {
-            $this->routes['GET'][$uri] = $controller;
-        }
-
-        public function post($uri, $controller)
-        {
-            $this->routes['POST'][$uri] = $controller;
-        }
-
-        public function direct($uri, $requestType)
-        {
-            if (array_key_exists($uri, $this->routes[$requestType])) {
-                return $this->routes[$requestType][$uri];
-            }
-
-            throw new Exception('No route defined for this URI');
-        }
-    }
-```
-实际项目中还会使用到 `put/patch`, `delete` 的请求方式，可以用到的时候再加上这样的方法。
+> 实际项目中还会使用到 `put/patch`, `delete` 的请求方式，可以自己试着写上。
 
 
 ## 使用 PDO 动态插入数据到数据库
 
-现在我们可以正常的获取 `post` 请求过来的数据，我们把`form`表单传递过来的`name`存储到数据库中，先在数据库中创建`users`表,
-里面有一个类型为`string` 的 `name`字段。
-
-我们先将`bootstrap.php` 中的`QueryBuilder`对象储存到`$app['database']`中， 其他对应的地方自己修改下。
+现在我们可以正常的获取 `post` 请求的数据了，我们需要把`form`表单传递过来的`description`的值存储到数据库中，再此之前我们先将`bootstrap.php` 中的`QueryBuilder`对象储存到`$app['database']`中， 这样在我们在入口页面直接引入`bootstrap.php`即可，不用再去接受`QueryBuilder`对象，耦合性会低一下，`bootstrap.php`更改的代码如下，入口页面自己改下：
 
 ```php
-// bootstrap.php
 
-$app['database'] = new QueryBuilder(
-    Connection::make($app['config']['database'])
-);
+    $app['database'] = new QueryBuilder(
+        Connection::make($app['config']['database'])
+    );
 ```
 
-假设我们的`QueryBuilder`对象已经拥有一个`insert`的方法， 那么在`add-name.php`中就可以这样调用.
+假设我们的`QueryBuilder`对象已经拥有一个`create`的方法， 那么在`add-task.php`中就可以这样调用.
 
 ```php
-    // insert($table, $parameters)
-    $app['database']->insert('users', [
-        'name' => $_POST['name']
+
+    $app['database']->create('tasks', [
+        'description' => $_POST['description'],
+        'completed'   => 0
     ]);
 ```
 
-现在去`QueryBuilder.php`中实现这个方法.
+在`QueryBuilder.php`中我们怎么样实现这个方法呢？我们肯定需要类式下面这样的一条 Sql 语句
 
-```php
-    // QueryBuilder.php
-    public function insert($table, $paramters)
-    {
-        // insert to users (name, age) values ('zhoujiping', 3);
-    }
+```sql
+
+    insert to tasks (description, completed) values ('测试发布任务', fasle);
 ```
 
 向数据库中插入数据的 `sql` 语言为 `insert into 表名 (表字段1, 表字段2 ...) values ('对应的值', '对应的值')`, 这里的表名，表字段和值都是动态的，是由我们传递进来的，相当于上面的 `sql` 语句的模版是这样的 `insert into %s (%s) values (%s)`。 我们可以通过字符串链接符 `.` 来拼装我们需要的 sql 语句， 不过在 php 中还有一个更好的函数叫做 `sprintf()` 可以帮我们做到这点，比如说:
 
 ```php
-    public function insert($table, $parameters)
+    public function create($table, $parameters)
     {
        $sql  = sprintf(
         'insert into %s (%s) values (%s)',
@@ -1902,13 +1605,13 @@ $app['database'] = new QueryBuilder(
 
 打印上面的 `$sql` 变量， 结果是 `string(36) "insert into one (two) values (three)"`, 看下结果就会知道`sprintf()`的用法了， 现在我们就来替换掉`one`, `two`, `three` 这三个值了， 首先`one`对应的是数据表名，就是我们参数中的`$table`。
 
-`two`是数据表的字段名，也就是我们 `$parameters` 的 key, 通过 `array_keys($parameters)` 可以获取由 $parameters 健值组成的一维数组,类似于`[name, age, email]`这样的，而我们这里需要的是 string 类型的, 类似这样的`(name, age, email)`， 如何将数组转成需要的字符串呢？ 如果不知道这样的php函数， 可以通过 google ` php array to string` 这样的关键词去搜索，我们会发现 `implode()` 函数可以解决这个问题 `implode(', ', $parameters)`。
+`two`是数据表的字段名，也就是我们 `$parameters` 的 key, 通过 `array_keys($parameters)` 可以获取由 $parameters 健值组成的一维数组,类似于`[description, completed]`这样的，而我们这里需要的是 string 类型的, 类似这样的`(description, completed)`， 如何将数组转成需要的字符串呢？ 如果不知道这样的php函数， 可以通过 google ` php array to string` 这样的关键词去搜索，我们会发现 `implode()` 函数可以解决这个问题 `implode(', ', $parameters)`。
 
-接着是`three` 字段对应的值，使用 PDO 插入数据都会需要经过一些 sql 语句的预处理，这里可以先用类式 `(:name, :age, :email)`这样的占位符， 然后执行的时候替换掉占位符即可。这样就能正确的插入数据到数据库了，完整的代码如下：
+接着是`three` 字段对应的值，使用 PDO 插入数据都会需要经过一些 sql 语句的预处理，这里可以先用类式 `(:description, :completed)`这样的占位符， 然后执行的时候替换掉占位符即可。这样就能正确的插入数据到数据库了，完整的代码如下：
 
 ```php
 
-    public function insert($table, $parameters)
+    public function create($table, $parameters)
     {
        $sql  = sprintf(
             'insert into %s (%s) values (%s)',
@@ -1919,37 +1622,36 @@ $app['database'] = new QueryBuilder(
 
        try {
             $statement = $this->pdo->prepare($sql);
-            $statement->execute($parameters); // 执行时替换 :name ['name' => '周继平'] 
+            $statement->execute($parameters);
        } catch (PDOException $e) {
-           die($e->getMessage());
-           // 如果是正式环境
-           // die('Something went wrong.');
-        }
+           die($e->getMessage());        
+       }
     }
-
 ```
-现在可以插入值到数据库了，不过页面上没有显示，先到数据库看下就行了，也可以在`add-name.php` 添加 `header('Location: /')` 让其暂时跳往首页。然后在`controllers/.index.php` 中使用`$app['database']->selectAll('users')`, 获取 users 数据， 在`index.view.php` 中显示它们，如下：
 
-```php
-    <?php foreach ($users as $user): ?>
-        <li><?= $user->name; ?></li>
-    <?php endforeach ?>
-```
+现在可以成功的插入值到数据库了，我们在`add-name.php` 上再添加一条 `header('Location: /')` 让其执行成功后跳往首页，在首页上我们能成功的看见新添加的任务了。
+
+![新添加的任务](/images/php/step_1/update_1.jpg)
+
+> `controllers/index.php` 中的代码自己编写下, 方法我们之前都已经写好的。
 
 ## 添加 composer 依赖包管理
 
-现在看我们的`bootstrap.php`中有一堆的`require` 语句，这么操作显然很麻烦，现在有一个 php 的包依赖管理工具很流行，叫做 composer 官方地址为： https://getcomposer.org/ 先按照提示进行全局安装。先将 `bootstrap.php`中的下面4句代码注销
+我们现在的项目中使用了一堆的`require` 语句, 这样的方式对项目管理并不是很好，现在有人为 php 开发了一个叫做 `composer` 的依赖包管理工具，非常好用，我们将其集成进来，composer 官方地址 https://getcomposer.org/ 按照提示进行全局安装即可。
+我们先将 `bootstrap.php`中的下面4句代码注销
 
 ```php
+
     // require 'core/Router.php';
     // require 'core/Request.php';
     // require 'core/database/Connection.php';
     // require 'core/database/QueryBuilder.php';
 ```
 
-然后在根目录下建立 `coomposer.json` 的文件,输入以下内容:
+然后在根目录下建立 `coomposer.json` 的配置文件,输入以下内容:
 
 ```json
+
     {
         "autoload": {
             "classmap": [
@@ -1959,27 +1661,19 @@ $app['database'] = new QueryBuilder(
     }
 ```
 
-上面的意思是将根目录下的所有文件都让其自动包含进来， 我们在命令行执行 `composer install`, 然后只需要在`index.php`添加`require 'vendor/autoload.php';` 即可。我们可以看见我们想要包含的文件都已经在`vendor/composer/autoload_classmap.php`文件中生成了对应关系。
+上面的意思是将根目录下的所有的**类文件**都加载进来， 在命令行执行 `composer install` 后，在根目录会生成出一个`vendor`的文件夹，我们以后通过 `composer` 安装的任何第三方代码都会被生成在这里。 
+
+下面在`bootstrap.php`添加`require 'vendor/autoload.php';` 即可。我们可以在`vendor/composer/autoload_classmap.php`文件中查看生成的文件对应关系。
 
 ## 实现第一个 依赖注入容器 DI Container 的雏形
 
-什么是 依赖注入容器 DI Container? 一个听上去非常高大上的东西，先不要去纠结字面的意思，你可以这么想，把我们的 APP 想象成一个很大的盒子，把我们所写的一些功能，比如说配置，数据库操作的`QueryBuilder`都扔到这个盒子里，但是扔进去的时候你要给它们贴一个标签，以后可以通过这个标签把它们取出来用。大体就是这个意思。
+什么是依赖注入容器`DI Container`? 一个听上去非常高大上的东西，先不要去纠结字面的意思，你可以这么想，把我们的 APP 想象成一个很大的盒子，把我们所写的一些功能，比如说配置，数据库操作等都扔到这个盒子里，在扔进去的时候你要给它们贴一个标签，以后可以通过这个标签把它们取出来用。大体就是这个意思。
 
+我们来看`bootstrap.php` 中的代码， 其实 `$app` 这个数组就可以看成是一个容器，我们把配置文件扔到数组中，贴上`config`的标签（也就是健），把`QueryBuilder`也扔进去了，贴上标签`database`。之后我们可以通过`$app['config']`这样拿出我们需要的值。
 
-我们来看`bootstrap.php` 中的代码， 其实 `$app` 这个数组就是一个容器，我们把配置文件扔到数组中，贴上`config`的标签，把`QueryBuilder`也扔进去了，贴上标签`database`。之后我们可以通过`$app['config']`这样拿出我们要的东东。
+我们为何不把`$app`数组做成一个对象呢！ 这样我们以后可以为其添加很多的属性和方法，会方便很多，需要对象就必须要有类，我们马上就可以在`core`文件夹内建立一个 `App.php` 的文件，当中包含`App`类。
 
-```php
-
-    $app = [];
-
-    $app['config'] = require 'config.php';
-
-    $app['database'] = new QueryBuilder(
-        Connection::make($app['config']['database'])
-    );
-```
-
-我们为何不把`$app`数组做成一个对象呢！ 这样我们以后可以为其添加很多的属性和方法，会方便很多，需要对象就必须要有类，我们马上就可以在`core`文件夹内建立一个 `App.php` 的文件，当中包含`App`类。下面看看我们需要哪些方法，先看 `$app['config'] = require 'config.php';` 这一句是把`config.php`放进到`App`的容器中，现在常用的说法是 注册`config` 到`App`, 或者是绑定`config` 到`App`, 那我们需要的方法可能是这样的。
+下面看看我们需要哪些方法，先看 `$app['config'] = require 'config.php';` 这一句是把`config.php`放进到`App`的容器中，现在常用的说法是 注册`config` 到`App`, 或者是绑定`config` 到`App`, 那我们需要的方法可能是这样的。
 
 ```php
 
@@ -1992,10 +1686,9 @@ $app['database'] = new QueryBuilder(
     App::register('config', require 'config.php');
 ```
 
-在我们写类的时候，可能不知道怎么动手，可以先尝试着调用假定存在的方法，再回头去完善类，相对会容易些，上面的几种方法个人感觉`App::bind(config', require 'config.php');`更好些，然后要取出`config`可以使用 `App::get('config')` 方法，下面去实现这两个方法。在`core/App.php` 中
+在我们写类的时候，可能不知道怎么动手，可以先尝试着调用假定存在的方法，再回头去完善类，之前我们也都是这么做的，这样相对会容易些，上面的几种方法个人感觉`App::bind(config', require 'config.php');`更好些，然后要取出`config`可以使用 `App::get('config')` 方法，下面去实现这两个方法。在`core/App.php` 中
 
 ```php
-<?php 
 
      class App
      {
@@ -2016,26 +1709,38 @@ $app['database'] = new QueryBuilder(
         }
      }
  ```
-
-将之前使用到`$app['config']`和`$app['database']`的地方全部用`App::get('config')`和`App::get('database')`替换过来，然后我们测试一下，毫无疑问的会提示“找不到APP的错误”，原因是在我们的`autoload_classmap.php`文件中并没有导入`App.php`文件，我们需要在命令行执行 `composer dump-autoload` 来重新生成`autoload_classmap.php`文件。
-
-
-## 重构控制器为控制器类
-
-现在我们的控制器中的代码还都是一些面条式的代码,现在我们将做出我们的控制器类，然后让路由指向到对应的控制器的方法，这样在我们以后的工作流中就会方便很多。
-
-我们在`controllers`文件夹下建立 `PagesController.php` 的文件, 编写以下的代码
+`bootstrap.php` 中目前代码如下：
 
 ```php
-<?php 
+    
+    require 'vendor/autoload.php';
+
+    App::bind('config', require 'config.php');
+
+    App::bind('database', new QueryBuilder(
+        Connection::make(App::get('config')['database'])
+    ));
+```
+
+将所有使用到`$app['config']`和`$app['database']`的地方全部用`App::get('config')`和`App::get('database')`替换过来，毫无疑问的会提示“找不到APP的错误”，原因是在我们的`autoload_classmap.php`文件中并没有导入`App.php`文件，我们需要在命令行执行 `composer dump-autoload` 来重新生成`autoload_classmap.php`文件。
+
+## 第四次代码重构 - 重构控制器
+
+### 新建控制器类
+
+现在我们的控制器中的代码还都是一些面条式的代码, 并没有使用面向对象的方式去开发，我们来重构下，我们需要编写控制器类，然后让路由指向到对应的控制器的方法，这样在我们以后的工作流中就会方便很多。
+
+我们在`controllers`文件夹下建立 `PagesController.php` 的文件, 编写以下的代码，将之前控制器中的文件中的代码都以方法的形式写在这个类中
+
+```php
 
     class PagesController
     {
         public function home()
         {
-            $users = App::get('database')->selectAll('users');
+            $tasks = App::get('database')->selectAll('tasks', 'Task');
 
-            require 'views/index.view.php';    
+            require 'views/index.view.php';
         }
 
         public function about()
@@ -2050,17 +1755,9 @@ $app['database'] = new QueryBuilder(
     }
 ```
 
-现在可以将`controllers`文件夹下的`index.php`, `about.php`, `contact.php`都删除了，现在我们访问首页肯定是出错的，因为我们的路由文件还没有改过来。我们可以将路由改成类式`laravel`框架的模样
+现在可以将`controllers`文件夹下的`index.php`, `about.php`, `contact.php`都删除了，将路由文件中的代码改成下面这样：
 
-```php
-<?php
-
-    $router->get('', 'controllers/PagesController@home');
-    $router->get('about', 'controllers/PagesController@about');
-    $router->get('contact', 'controllers/PagesController@contact');
-```
-
-我们现在使用 `composer` 的自动加载文件，路经换成下面这样也是能够找到对应的文件的。
+### 更改路由文件
 
 ```php
 
@@ -2069,25 +1766,31 @@ $app['database'] = new QueryBuilder(
     $router->get('contact', 'PagesController@contact');
 ```
 
-比方说上面的`about`的路由，意思是当访问`about`,就调用`PagesController`类的`about`方法, 所以我们要修改`Router.php`中的`direct()`方法。目前我们通过`$this->routes[$requestType][$uri]` 返回的是类式`PagesController@home`这样的 uri， 现在事实上我们希望的是这样的代码 `(new PagesController)->home();` 我们先假定有这样的方法叫做 `callAction()`,改下下现在的`direct()`方法.
+### 初次修改 `direct()` 方法
+
+现在我的意图是这样的，以`about`路由举例，当我们访问`about`, 就会调用`PagesController`类的`about`方法, 在`about`方法中直接运行逻辑代码。所以我们需要修改`Router.php`中的`direct()`方法。
+
+目前`direct()`是根据相对路径返回对应控制器类的路径，然后在入口页面将其引入进来执行，现在我们只需要通过实例化控制器类，然后调用对应的方法即可。 那`direct()`的核心代码应该是类式这样的：`(new PagesController)->about();` 我们暂且把这个功能命名为 `callAction()` 方法，先将定已经有了这个方法, 我们先去 `direct()`方法中调用它， 如下：
 
 ```php
 
     public function direct($uri, $requestType)
     {
         if (array_key_exists($uri, $this->routes[$requestType])) {
-            return $this->callAction();
+            return $this->callAction('这里应该有参数');
         }
 
         throw new Exception('No route defined for this URI');
     }
 ```
 
-我们来建立 `callAction()` 方法, 大体是这样的：
+### 实现私有方法 `callAction()` 
+
+下面考虑下 Router 类中的 `callAction()` 方法该怎么实现，刚才说了这个方法的核心是 `(new Controller)->action();` 不多考虑，我们给这个方法两个参数，$controller 和 $action, 代码如下：
 
 ```php
 
-    public function callAction($controller, $action)
+    private function callAction($controller, $action)
     {
         $controllerObj = new $controller;
 
@@ -2101,25 +1804,27 @@ $app['database'] = new QueryBuilder(
     }
 ```
 
-上面的代码很简单，不用讲解，现在的问题是`direct()` 中调用`callAction()`的参数我们该如何获取，现在已经知道`$this->routes[$requestType][$uri]`的值是类式于 `PagesController@home` 这样的字符串，我们可以用`$this->routes[$requestType][$uri]` 将其拆分为 `['PagesController', 'home']` 这样的数组，然后使用 php5.6 之后出现的 `...`运算符，将其作为参数传递，我们具体来看下`explode()` 函数。
+### `...` 运算符和 `explode()` 函数用法
 
+上面的 `method_exists($obj, $action)` 方法是判断一个对象中是否某个方法，那在 `direct()` 中调用`callAction()`的参数我们该如何获取呢？ 我们现在的 `$this->routes[$requestType][$uri]`的值是类式于 `PagesController@about` 这样的字符串，我们只需将该值拆分为 `['PagesController', 'about']` 这样的数组，然后使用 php5.6 之后出现的 `...`运算符，将其作为参数传递，关于拆分字符串为数组，php 也给我们提供了一个这样的函数，叫做 `explode()`, 我们先看下这个函数的用法，
 打开终端，输入 `php --interactive` 进入命令行交互模式
 
 ```bash
-$ php --interactive
 
-php > $values = explode('@', 'PagesController@home');
-php > var_dump($values);
-array(2) {
-  [0]=>
-  string(15) "PagesController"
-  [1]=>
-  string(4) "home"
-}
+    $ php --interactive
+
+    php > $values = explode('@', 'PagesController@about');
+    php > var_dump($values);
+    array(2) {
+      [0]=>
+      string(15) "PagesController"
+      [1]=>
+      string(4) "about"
+    }
 
 ```
 
-现在看下`direct()` 方法:
+好了，现在就可以修改下`direct()` 这个方法了，如下：
 
 ```php
 
@@ -2135,7 +1840,17 @@ array(2) {
     }
 ```
 
-下面更改下 `PagesController` 的 `require 'views/about.view.php';` 这句代码，我们改成 `return view('about');` 这样，可读性会好很多。在`bootstrap.php` 上加上我们的这个`view()` 全局函数
+关于`...explode('@', $this->routes[$requestType][$uri])` 这里的 `...` 操作符， 它会把一维数组中的第一个元素作为参数1， 第二个元素作为参数2，以此类推，这是 php5.6 后新出的语法，可以自己查阅文档。
+
+### 修改入口页面的代码
+
+ok, 现在将入口页面的这句代码`require Router::load('routes.php')->direct(Request::uri(), Request::method());`的 require 去掉吧。再测试之前不要忘记了在命令行运行 `composer dump-autoload` 来重新加载文件。
+
+### 创建全局函数 view()
+
+下面更改下 `PagesController` 的 `require 'views/about.view.php';` 这句代码，我们改成 `return view('about');` 这样，可读性会好很多。同时在 `psr标准中` 也有这样的规定，在声明一个类的文件中是不能存在 `require` 代码的。
+
+我们在`core`下创建一个`helps.php`的文件，把所有的全局函数都放在这里，准确来说帮助函数的文件不应该放在这里，它并不属于核心文件，但是为了我们这里写的帮助函数基本都是给我们的框架使用的，不设计业务开发，所以暂时还是先放这里。`view()`函数很简单，如下：
 
 ```php
 
@@ -2147,13 +1862,38 @@ array(2) {
     }
 ```
 
-在看`PagesController`的`home` 方法当中有`$users`对象集合， 我们怎么传递它到`view`中呢？ 假设可以这样：
+在`PagesController`的`home` 方法当中有`$tasks`对象集合， 我们怎么传递它到`view()`函数中呢？ 我们需要给`view()`设置第二个数组形式的参数，调用`view()`的时候，将数据以数组的形式传递给`view()`即可，如下：
 
 ```php
-    return view('index', ['users' => $users]);
+
+    return view('index', ['tasks' => $tasks]);
 ```
 
-更改全局函数`view()` 如下：
+现在在`view()`函数中会出现问题了，我们传入的数据是一个数组，而在`index.view.php`中使用的是`$tasks`这样的变量，怎么转化？使用PHP提供的`extract()`函数可以做到这点，它可以将数组中的元素以变量的形式导入到当前的符号表，这句话不好懂，我们来演示下就明白了，还是进入 php 的命令行交互模式， 如下：
+
+```bash
+
+    php > $data = ['name' => 'zhoujiping', 'age' => 3];
+    php > echo $name;
+    PHP Notice:  Undefined variable: name in php shell code on line 1
+
+    Notice: Undefined variable: name in php shell code on line 1
+```
+
+看上面的提示，我们就定义一个数组，然后想要输出变量 `$name` 的值，提示没有定义的变量，再看下面的测试：
+
+
+```php
+
+    php > $data = ['name' => 'zhoujiping', 'age' => 3];
+    php > extract($data);
+    php > echo $name;
+    zhoujiping
+    php > echo $age;
+    3
+```
+
+使用了`extract()`函数就会自动帮我们定义好与数组 key 同名的变量，并将 key 对应的 value 赋值给了该变量，好了，下面我们把`view()`方法完善下，如下：
 
 ```php
 
@@ -2161,114 +1901,108 @@ array(2) {
     {
         extract($data);
 
-        return require "views/{$path}.view.php";
+        return require "views/{$name}.view.php";
     }
 ```
 
-关于 `extract($data)`, 它可以将数组中将变量导入到当前的符号表， 看下输出就明白了，我们在命令行测试下：
+### 通过 composer 加载不是类的文件
 
-```php
-php > $data = ['user' => 'zhoujiping'];
-php > extract($data);
-php > echo $user;
-zhoujiping
+下面自己把控制器中与`view()`相关的代码都更改过来，然后运行`composer dump-autoload`,它还是会提示找不到`view()`函数，原因在于我们的`composer.json`中的配置,我们需要将配置改成下面这样：
+
+```json
+
+    {
+        "autoload": {
+            "classmap": [
+                "./"
+            ],
+            "files": [
+                "core/helpers.php"
+            ]
+        }
+    }
 ```
 
-我们在`routes.php` 再创建这样一条路由:
+上面的`classmap`只会加载类文件，要加载普通的文件需要使用 `"files": []`，好了，最后别忘记了`composer dump-autoload`.
 
-```php
-    $router->get('users', 'UsersController@index');
-    $router->post('users', 'UsersController@store');
+### 控制器和路由的一些命名规范
+
+ 现在我们只完成了`get`方式请求的页面，还有一个发布任务的路由还没有写，我们来做一下。 现在我们需要新建一个控制器类的文件 `TasksController.php`, 通常一个控制器类的路由和方法是按下面这样定义的：
+
+ ```php
+
+    // tasks 的列表页
+    $router->get('tasks', 'TasksController@index');
+
+    // 显示创建 Task 任务的表单
+    $router->get('tasks／create', 'TasksController@create');
+
+    // 存储Task到数据库
+    $router->post('tasks', 'TasksController@store');
+    
+    // 显示具体的一个Task
+    $router->get('tasks/{task}', 'TasksController@show');
+
+    // 显示编辑具体的某个Task的表单
+    $router->get('tasks/{task}/edit', 'TasksController@edit');
+
+    // 修改具体的某个Task
+    $router->put('tasks/{task}', 'TasksController@update');
+    
+    // 删除某个 Task
+    $router->delete('tasks/{task}', 'TasksController@destroy');
 ```
 
-建立 `UsersController` 控制器
+我们在 `routes.php` 中修改下当中的路由：
 
 ```php
 
-<?php 
+    $router->get('about', 'PagesController@about');
+    $router->get('contact', 'PagesController@contact');
 
-    class UsersController
+    $router->get('', 'TasksController@index');
+    $router->post('tasks', 'TasksController@store');
+```
+
+我们将首页指向`TasksController`的`index()`方法， 并创建一条新路由，用于存储新创建的任务记录，然后将`TasksController`中的代码补全，如下：
+
+```php
+
+    class TasksController
     {
         public function index()
         {
-            $users = App::get('database')->selectAll('users');
+            $tasks = App::get('database')->selectAll('tasks', 'Task');
 
-            return view('users', compact('users'));
+            return view('index', compact('tasks'));
         }
 
         public function store()
         {
-            App::get('database')->insert('users', [
-                'name' => $_POST['name']
+            App::get('database')->create('tasks', [
+                'description' => $_POST['description'],
+                'completed'   => 0
             ]);
 
-            return redirect('users');
+            return redirect('/');
         }
     }
 ```
 
-视图层自己建立下， 看上面的`redirect()`全局函数， 如下
+这里我们又调用了新的全局函数`redirect()`， 去`helpers.php`中创建它, 如下：
 
 ```php
-    function redirect($path)
+
+    function redirect($path = '')
     {
         header("Location: /{$path}");
     }
 ```
 
-## 命名空间
+##  使用命名空间 Namespace
 
-命名空间，把它想象成文件夹就可以了， 我们现在所有的类都在同一个命名空间下， 我们可以为类加上自己的命名空间
+从 PHP5.3 开始就支持命名空间了，关于命名空间的介绍看官方文档： http://php.net/manual/zh/language.namespaces.php 。其实也很简单，你把命名空间想象层文件夹就行了。关于更改成命名空间的代码去 github 上克隆代码下来查看即可。 https://github.com/zhoujiping/build-your-own-php-framework。
 
+## 写在最后的话
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+本文章到这里先告一个段落了，虽然还有很多功能都没有实现，但是最近是不会再更新这篇文章了，如果有错会修正，按照这个思路，大家已经可以自己继续往下开发了。

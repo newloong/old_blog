@@ -47,6 +47,7 @@ menu:
   new: /
   php: /categories/php/
   php-step-1: /php/build-your-own-php-framework/
+  php-step-2: /php/php-object/
   # about: /about
   # laravel-tutorial: http://blog.zhoujiping.com/laravel-tutorial.html
   #sitemap: /sitemap.xml
@@ -77,6 +78,9 @@ menu_icons:
   php-step-1: angle-right
   php-step-2: angle-right
   php-step-3: angle-right
+  php-step-4: angle-right
+  php-step-5: angle-right
+  php-step-6: angle-right
 
 
 

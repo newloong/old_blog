@@ -47,7 +47,7 @@ menu:
   new: /
   php: /categories/php/
   php-step-1: /php/build-your-own-php-framework/
-  php-step-2: /php/php-object/
+  php-step-2: php/rules-for-simpler-code  
   # about: /about
   # laravel-tutorial: http://blog.zhoujiping.com/laravel-tutorial.html
   #sitemap: /sitemap.xml

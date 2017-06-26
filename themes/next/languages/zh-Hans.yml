@@ -20,7 +20,7 @@ menu:
   laravel-tutorial: Laravel教程
   php: PHP 相关知识技能整理
   php-step-1: 第1章：PHP框架是如何诞生的？
-  php-step-2: 第2章：面向对象的总结和思考
+  php-step-2: 第2章：编写简洁代码的一些规则
 
 sidebar:
   overview: 站点概览

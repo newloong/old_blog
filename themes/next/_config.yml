@@ -48,6 +48,7 @@ menu:
   php: /categories/php/
   php-step-1: /php/build-your-own-php-framework/
   php-step-2: php/rules-for-simpler-code  
+  php-step-3: /php/build-command-line-app/
   # about: /about
   # laravel-tutorial: http://blog.zhoujiping.com/laravel-tutorial.html
   #sitemap: /sitemap.xml
@@ -75,12 +76,19 @@ menu_icons:
   laravel-tutorial: book
   new: refresh
   php: book
+  laravel: book
   php-step-1: angle-right
   php-step-2: angle-right
   php-step-3: angle-right
   php-step-4: angle-right
   php-step-5: angle-right
   php-step-6: angle-right
+  laravel-step-1: angle-right
+  laravel-step-2: angle-right
+  laravel-step-3: angle-right
+  laravel-step-4: angle-right
+  laravel-step-5: angle-right
+  laravel-step-6: angle-right
 
 
 

@@ -6,6 +6,9 @@ categories:
  - php
 ---
 
+> 关于开发 Laravel Installer 的源码地址：
+> https://github.com/zhoujiping/build-your-own-laravel-installer
+
 ## PHP的命令行模式
 
 什么是PHP命令行模式？ 通常我们编写的 APP 都是基于浏览器的，用户通过浏览器访问网页，提交一些参数过来，服务器处理后返回视图给他们。而PHP除了这种模式外，还有一种命令行模式也很强大，我们可以在命令行中执行 PHP 的函数，也可以执行一个 PHP 文件，比如说可以在命令行执行  `php -r "echo 'Hello world';"` 来输出 Hello World. 也可以编写一个 PHP 文件来执行, 比如说在 laravel 中我们经常会用到 `php artisan` 的命令，比如我们新建一个 `artisan.php`, 当中代码如下：
@@ -273,12 +276,142 @@ categories:
 
 好了，现在就达到我们的要求了。 到这里，基本的Symfony Console包的用法我们已经会了，更详细的内容可以访问它的官方文档。通过上面的知识，我们已经可以自己去开发一个 `Laravel Installer` 这样的应用了。
 
-## 开发一个阉割版的 Laravel Installer
+## 开发Laravel Installer
 
-未完。。。。
+如果你已经安装好了 Laravel Installer， 可以在命令行先执行 `laravel`, 会显示下面这样的界面，我们先做出这样的界面，然后再去编写 `laravel new xxx` 命令，界面如下：
 
+![laravel Installer](/images/php/step_3/4.png)
 
+我们再上面的项目上进行改写即可, 将 `zhoujiping` 文件更名为 `laravel`, 将`SayHelloCommand.php` 更名为 `NewCommand.php`, `laravel` 文件中的代码如下：
 
+```php
 
+    #! /usr/bin/env php
+
+<?php
+
+    require __DIR__ . '/vendor/autoload.php';
+
+    use Zhoujiping\Demo\Console\NewCommand;
+    use Symfony\Component\Console\Application;
+
+    $app = new Application('Zhoujiping Laravel Installer', '1.0');
+
+    $app->add(new NewCommand);
+
+    $app->run();
+```
+
+更改 `NewCammand.php` 中的`configure()` 方法如下：
+
+```php
+    
+    public function configure()
+    {
+        $this
+            ->setName('new')
+            ->setDescription('Create a new Laravel application.')
+            ->addArgument('name', InputArgument::REQUIRED, 'Your project name');
+    }
+```
+
+下面主要是要实现`execute()` 方法，这个方法主要是要处理下面这样的逻辑
+
+```php
+
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        //  1. 检查想要安装的项目是否已经存在
+        
+        // 2. 下载最新版的 laravel 框架的 zip文件
+        
+        // 3. 解压 zip 文件
+
+        // 4. 删除 zip 文件
+        
+        // 4. 告诉用户你已经完成安装   
+    }
+```
+我们按上面的步骤来实现下具体的代码。首先我们需要实现这个`verifyApplicationDoesNotExist($directory)`的方法, 如下:
+
+```php
+
+    private function verifyApplicationDoesNotExist($directory, OutputInterface $output)
+    {
+        if (is_dir($directory)) {
+            $output->writeln("<error>Application already exists!</error>");
+            exit(1);
+        }
+    }
+```
+
+在 `execute()` 中按下面的方式调用
+
+```php
+    
+    // getcwd() 能返回当前的工作目录，如我在 ～/Code/symfony-console-demo 下面执行 `./laravel new xx`
+    // 则 getcwd() 返回的就是 ～/Code/symfony-console-demo
+
+    $directory = getcwd() . '/' . $input->getArgument('name');
+    $this->verifyApplicationDoesNotExist($directory, $output);
+```
+
+好了，现在在当前目录下建立一个 `demo` 的文件夹，然后执行 `./laravel new demo` 则会成功的提示我们项目已经存在的提示。
+
+第二步的下载 laravel 框架和第三步的解压，我们需要 `download()` 和 `extract()` 方法。关于下载，我们可以使用`guzzlehttp/guzzle` 包，通过 `composer require guzzlehttp/guzzle` 安装它. 安装完后，在构造函数中依赖注入这个对象，`download()` 方法代码如下：
+
+```php
+    
+    // 调用方式： $this->download($this->makeFileName()); 
+    private function download($zipFile)
+    {
+        $response = $this->client->get('http://cabinet.laravel.com/latest.zip')->getBody();
+        file_put_contents($zipFile, $response);
+
+        return $this;
+    }
+    
+    private function makeFileName()
+    {
+        return getcwd() . '/laravel_' . md5(time().uniqid()) . '.zip';
+    }
+```
+
+现在已经可以正常下载最新版的 laravel 框架了，并且文件名我们也做成了唯一的形式，现在我们需要解压它，可以使用 PHP 的 ZipArchive 来实现这点，代码如下：
+
+```php
+    
+    // 调用方式： $this->download($zipFile = $this->makeFileName())->extract($zipFile, $directory);
+    private function extract($zipFile, $directory)
+    {
+        $archive = new ZipArchive;
+
+        $archive->open($zipFile);
+        $archive->extractTo($directory);
+        $archive->close();
+
+        return $this;
+    }
+```
+
+最后删除 zip 文件，编写 `cleanUp()` 方法，代码如下：
+
+```php
+
+    public function cleanUp($zipFile)
+    {
+        // 将文件权限设置为777
+        @chmod($zipFile, 0777);
+        @unlink($zipFile);
+
+        return $this;
+    }
+```
+
+OK，最后我们尝试运行下，如下
+
+![编写自己的 Laravel Installer](/images/php/step_3/5.png)
+
+> 该部分的源码地址： https://github.com/zhoujiping/build-your-own-laravel-installer 我们并没有实现`composer install` 和版本选择，以及安装的进程信息，这些可以自己看下 laravel installer 的源码自己去优化。
 
 
